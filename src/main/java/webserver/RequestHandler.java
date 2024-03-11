@@ -29,7 +29,7 @@ public class RequestHandler implements Runnable {
             byte[] body = getHtml(BASE_PATH + requestPath).getBytes(); // 여기가 Response Body.
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
     }
@@ -54,7 +54,7 @@ public class RequestHandler implements Runnable {
     }
 
     // 파일의 경로를 매개로 받아 해당 파일의 내용을 반환
-    private String getHtml(String path) {
+    private String getHtml(String path) throws IOException {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -62,14 +62,19 @@ public class RequestHandler implements Runnable {
                 sb.append(line);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            throw new IOException("file not found : " + path);
         }
         return sb.toString();
     }
 
     public ContentType getContentTypeByPath(String path) {
         String ext = path.substring(path.lastIndexOf(".") + 1).toUpperCase();
-        return ContentType.valueOf(ext.toUpperCase());
+        for (ContentType type : ContentType.values()) {
+            if (type.name().equals(ext)) {
+                return ContentType.valueOf(ext);
+            }
+        }
+        throw new IllegalArgumentException("Invalid file extension. : " + path); // 없는 확장자인 경우.
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
@@ -82,7 +87,6 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
