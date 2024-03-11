@@ -23,16 +23,11 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-
-            //readRequestLine(in);
-            // printRequestAll(in);
-
-            // TODO 사용자 요청에 대한 처리는 이 위에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
             String requestPath = RequestLineParser.parsePath(readRequestLine(in));
-
+            ContentType contentType = getContentTypeByPath(requestPath);
+            DataOutputStream dos = new DataOutputStream(out);
             byte[] body = getHtml(BASE_PATH + requestPath).getBytes(); // 여기가 Response Body.
-            response200Header(dos, body.length);
+            response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -72,17 +67,22 @@ public class RequestHandler implements Runnable {
         return sb.toString();
     }
 
+    public ContentType getContentTypeByPath(String path) {
+        String ext = path.substring(path.lastIndexOf(".") + 1).toUpperCase();
+        return ContentType.valueOf(ext.toUpperCase());
+    }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: "+ contentType.getContentTypeMsg() + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
+
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
