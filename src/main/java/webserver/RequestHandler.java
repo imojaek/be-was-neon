@@ -23,10 +23,10 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            String requestPath = RequestLineParser.parsePath(readRequestLine(in));
-            ContentType contentType = getContentTypeByPath(requestPath);
+            RequestLine requestLine = RequestLineParser.parse(readRequestLine(in));
+            ContentType contentType = getContentTypeByPath(requestLine.getPath());
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getHtml(BASE_PATH + requestPath).getBytes(); // 여기가 Response Body.
+            byte[] body = getHtml(BASE_PATH + requestLine.getPath()).getBytes(); // 여기가 Response Body.
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException | IllegalArgumentException e) {
