@@ -86,6 +86,17 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private void response307Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 307 Temporary Redirect \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
@@ -100,9 +111,9 @@ public class RequestHandler implements Runnable {
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
-        byte[] body = getHtml(BASE_PATH + "/index.html").getBytes();
-        response200Header(dos, body.length, ContentType.HTML);
-        responseBody(dos, body);
+        // 데이터가 포함되어있는 url을 브라우저의 주소창에서 제거하기 위함입니다.
+        // 302가 아니라 307을 선택한 이유는, 아직은 굳이 클라이언트의 요청메소드를 바꾸지 않는게 좋을 것 같기 때문입니다.
+        response307Header(dos, "/index.html");
     }
 
     private HashMap<String, String> parseDataString(String dataString) {
