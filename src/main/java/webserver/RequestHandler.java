@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 
-import Parser.RequestLineParser;
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
@@ -22,20 +21,22 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+//        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
+//                connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            RequestLine requestLine = RequestLineParser.parse(readRequestLine(in));
+            HttpRequest httpRequest = new HttpRequest(in);
 
-            if (requestLine.getPath().equals("/user/create")) {
-                addNewUser(dos, requestLine.getDataString());
+            logger.debug("Request : {}", httpRequest.getRequestLine());
+
+            if (httpRequest.getPath().equals("/user/create")) {
+                addNewUser(dos, httpRequest.getDataString());
                 return ;
             }
 
-            ContentType contentType = getContentTypeByPath(requestLine.getPath());
-            byte[] body = getHtml(BASE_PATH + requestLine.getPath()).getBytes();
+            ContentType contentType = getContentTypeByPath(httpRequest.getPath());
+            byte[] body = getHtml(BASE_PATH + httpRequest.getPath()).getBytes();
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException | IllegalArgumentException e) {
@@ -95,7 +96,6 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
