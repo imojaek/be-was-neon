@@ -3,8 +3,11 @@ package webserver;
 import java.io.*;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.HashMap;
 
 import Parser.RequestLineParser;
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +26,16 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            RequestLine requestLine = RequestLineParser.parse(readRequestLine(in));
-            ContentType contentType = getContentTypeByPath(requestLine.getPath());
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = getHtml(BASE_PATH + requestLine.getPath()).getBytes(); // 여기가 Response Body.
+            RequestLine requestLine = RequestLineParser.parse(readRequestLine(in));
+
+            if (requestLine.getPath().equals("/user/create")) {
+                addNewUser(dos, requestLine.getDataString());
+                return ;
+            }
+
+            ContentType contentType = getContentTypeByPath(requestLine.getPath());
+            byte[] body = getHtml(BASE_PATH + requestLine.getPath()).getBytes();
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException | IllegalArgumentException e) {
@@ -40,17 +49,6 @@ public class RequestHandler implements Runnable {
         String line = br.readLine();
         logger.debug("Request : {}", line);
         return line;
-    }
-
-    // br의 끝까지 읽으면서 br의 내용을 출력한다.
-    private void printRequestAll(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
-        line = br.readLine();
-        logger.debug("Request : {}", line);
-        while ((line = br.readLine()) != null && (line.length() > 1)) {
-            logger.debug("Header : {}", line);
-        }
     }
 
     // 파일의 경로를 매개로 받아 해당 파일의 내용을 반환
@@ -74,7 +72,7 @@ public class RequestHandler implements Runnable {
                 return ContentType.valueOf(ext);
             }
         }
-        throw new IllegalArgumentException("Invalid file extension. : " + path); // 없는 확장자인 경우.
+        throw new IllegalArgumentException("Invalid file extension. : " + path); //  지원하지 않는 확장자인 경우.
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
@@ -95,5 +93,25 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void addNewUser(DataOutputStream dos, String dataString) throws IOException {
+        HashMap<String, String> dataMap = parseDataString(dataString);
+        Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
+        logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
+
+        byte[] body = getHtml(BASE_PATH + "/index.html").getBytes();
+        response200Header(dos, body.length, ContentType.HTML);
+        responseBody(dos, body);
+    }
+
+    private HashMap<String, String> parseDataString(String dataString) {
+        HashMap<String, String> dataMap = new HashMap<>();
+        String[] datas = dataString.split("&");
+        for (String data : datas) {
+            String[] splitData = data.split("=");
+            dataMap.put(splitData[0], splitData[1]);
+        }
+        return dataMap;
     }
 }
