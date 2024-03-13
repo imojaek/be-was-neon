@@ -20,4 +20,15 @@ public class RequestLine {
     public String getDataString() {
         return dataString;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(method).append(" ").append(path);
+        if (!dataString.isEmpty()) {
+            sb.append("?").append(dataString);
+        }
+        sb.append(" ").append(version);
+        return sb.toString();
+    }
 }
