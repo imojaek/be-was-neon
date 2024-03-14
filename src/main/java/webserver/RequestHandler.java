@@ -45,7 +45,7 @@ public class RequestHandler implements Runnable {
         httpResponse.setVersion(request.getHttpVersion());
         httpResponse.setStatusCode(200);
         ContentType contentType = getContentTypeByPath(request.getPath());
-        httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg());
+        httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
         byte[] body = readFileByte(BASE_PATH + request.getPath()).getBytes();
         httpResponse.setBody(body);
         httpResponse.sendResponse(dos);

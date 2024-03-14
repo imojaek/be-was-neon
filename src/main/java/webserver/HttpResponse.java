@@ -55,7 +55,7 @@ public class HttpResponse {
     }
 
     public void setBody(byte[] body) {
-        addHeader("Content-Length", body.length + ";charset=utf-8");
+        addHeader("Content-Length", String.valueOf(body.length));
         this.body = body;
     }
 }
