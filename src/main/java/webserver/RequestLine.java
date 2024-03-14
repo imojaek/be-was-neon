@@ -20,6 +20,9 @@ public class RequestLine {
     public String getDataString() {
         return dataString;
     }
+    public String getVersion() {
+        return version;
+    }
 
     @Override
     public String toString() {

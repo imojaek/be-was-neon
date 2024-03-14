@@ -1,7 +1,6 @@
 package webserver;
 
 import java.io.*;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 
@@ -13,8 +12,8 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String BASE_PATH = "./src/main/resources/static";
-
     private Socket connection;
+    private HttpResponse httpResponse = new HttpResponse();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -29,31 +28,31 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = new HttpRequest(in);
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
-
+            // 이 아래로 요청에 대한 처리.
             if (httpRequest.getPath().equals("/user/create")) {
-                addNewUser(dos, httpRequest.getDataString());
+                addNewUser(dos, httpRequest);
                 return ;
             }
 
-            ContentType contentType = getContentTypeByPath(httpRequest.getPath());
-            byte[] body = getHtml(BASE_PATH + httpRequest.getPath()).getBytes();
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+            sendFile(dos, httpRequest);
+
         } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
     }
 
-    // request 의 시작 라인만 읽어 콘솔에 출력해 무엇을 요청하는지 확인할 수 있다.
-    private String readRequestLine(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line = br.readLine();
-        logger.debug("Request : {}", line);
-        return line;
+    private void sendFile(DataOutputStream dos, HttpRequest request) throws IOException {
+        httpResponse.setVersion(request.getHttpVersion());
+        httpResponse.setStatusCode(200);
+        ContentType contentType = getContentTypeByPath(request.getPath());
+        httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg());
+        byte[] body = readFileByte(BASE_PATH + request.getPath()).getBytes();
+        httpResponse.setBody(body);
+        httpResponse.sendResponse(dos);
     }
 
     // 파일의 경로를 매개로 받아 해당 파일의 내용을 반환
-    private String getHtml(String path) throws IOException {
+    private String readFileByte(String path) throws IOException {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -76,44 +75,17 @@ public class RequestHandler implements Runnable {
         throw new IllegalArgumentException("Invalid file extension. : " + path); //  지원하지 않는 확장자인 경우.
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, ContentType contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: "+ contentType.getContentTypeMsg() + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response307Header(DataOutputStream dos, String location) {
-        try {
-            dos.writeBytes("HTTP/1.1 307 Temporary Redirect \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void addNewUser(DataOutputStream dos, String dataString) throws IOException {
-        HashMap<String, String> dataMap = parseDataString(dataString);
+    private void addNewUser(DataOutputStream dos, HttpRequest request) throws IOException {
+        HashMap<String, String> dataMap = parseDataString(request.getDataString());
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
         // 데이터가 포함되어있는 url을 브라우저의 주소창에서 제거하기 위함입니다.
         // 302가 아니라 307을 선택한 이유는, 아직은 굳이 클라이언트의 요청메소드를 바꾸지 않는게 좋을 것 같기 때문입니다.
-        response307Header(dos, "/index.html");
+        httpResponse.setVersion(request.getHttpVersion());
+        httpResponse.setStatusCode(307);
+        httpResponse.addHeader("Location", "/index.html");
+        httpResponse.sendResponse(dos);
     }
 
     private HashMap<String, String> parseDataString(String dataString) {

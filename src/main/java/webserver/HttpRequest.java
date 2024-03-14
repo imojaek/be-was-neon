@@ -65,6 +65,10 @@ public class HttpRequest {
         return requestLine;
     }
 
+    public String getHttpVersion() {
+        return requestLine.getVersion();
+    }
+
     public String getPath() {
         return requestLine.getPath();
     }
