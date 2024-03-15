@@ -1,22 +1,26 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.HashMap;
-
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String BASE_PATH = "./src/main/resources/static";
     private Socket connection;
     private HttpResponse httpResponse = new HttpResponse();
+    private Map<String, BiConsumer<DataOutputStream, HttpRequest>> actionMap = new HashMap<>();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        makeActionMap();
     }
 
     public void run() {
@@ -29,16 +33,32 @@ public class RequestHandler implements Runnable {
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
             // 이 아래로 요청에 대한 처리.
-            if (httpRequest.getPath().equals("/user/create")) {
-                addNewUser(dos, httpRequest);
-                return ;
-            }
-
-            sendFile(dos, httpRequest);
+            actionByPath(dos, httpRequest);
 
         } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void actionByPath(DataOutputStream dos, HttpRequest request) throws IOException {
+        for (String definedPath : actionMap.keySet()) {
+            if (definedPath.equals(request.getPath())) {
+                actionMap.get(definedPath).accept(dos, request);
+                return ;
+            }
+        }
+        sendFile(dos, request);
+    }
+
+    private Map<String, BiConsumer<DataOutputStream, HttpRequest>> makeActionMap() {
+        actionMap.put("/user/create", (inputDos, inputRequest) -> {
+            try {
+                addNewUser(inputDos, inputRequest);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+            }
+        });
+        return actionMap;
     }
 
     private void sendFile(DataOutputStream dos, HttpRequest request) throws IOException {
