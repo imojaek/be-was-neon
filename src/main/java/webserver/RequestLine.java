@@ -1,10 +1,10 @@
 package webserver;
 
 public class RequestLine {
-    private String method;
-    private String path;
-    private String dataString;
-    private String version;
+    private final String method;
+    private final String path;
+    private final String dataString;
+    private final String version;
 
     public RequestLine(String method, String url, String data, String version) {
         this.method = method;

@@ -1,5 +1,6 @@
 package webserver;
 
+import Parser.RequestParser;
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
@@ -14,9 +15,10 @@ import java.util.function.BiConsumer;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String BASE_PATH = "./src/main/resources/static";
-    private Socket connection;
-    private HttpResponse httpResponse = new HttpResponse();
+    private final Socket connection;
+    private final HttpResponse httpResponse = new HttpResponse();
     private Map<String, BiConsumer<DataOutputStream, HttpRequest>> actionMap = new HashMap<>();
+    private final RequestParser requestParser = new RequestParser();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -29,7 +31,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            HttpRequest httpRequest = new HttpRequest(in);
+            HttpRequest httpRequest = requestParser.parse(in);
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
             // 이 아래로 요청에 대한 처리.
