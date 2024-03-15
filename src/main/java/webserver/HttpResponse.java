@@ -52,4 +52,8 @@ public class HttpResponse {
         addHeader("Content-Length", String.valueOf(body.length));
         this.body = body;
     }
+
+    public String getHeader(String name) {
+        return headers.get(name);
+    }
 }
