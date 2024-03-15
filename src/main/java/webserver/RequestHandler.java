@@ -45,23 +45,17 @@ public class RequestHandler implements Runnable {
         httpResponse.setResponseLine(request.getHttpVersion(), 200);
         ContentType contentType = getContentTypeByPath(request.getPath());
         httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
-        byte[] body = readFileByte(BASE_PATH + request.getPath()).getBytes();
+        byte[] body = readFileByte(BASE_PATH + request.getPath());
         httpResponse.setBody(body);
         httpResponse.sendResponse(dos);
     }
 
     // 파일의 경로를 매개로 받아 해당 파일의 내용을 반환
-    private String readFileByte(String path) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            throw new IOException("file not found : " + path);
+    private byte[] readFileByte(String path) throws IOException {
+        try (FileInputStream fis = new FileInputStream(new File(path))) {
+            byte[] bytes = fis.readAllBytes();
+            return bytes;
         }
-        return sb.toString();
     }
     public ContentType getContentTypeByPath(String path) {
         String ext = path.substring(path.lastIndexOf(".") + 1).toUpperCase();
