@@ -42,8 +42,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void sendFile(DataOutputStream dos, HttpRequest request) throws IOException {
-        httpResponse.setVersion(request.getHttpVersion());
-        httpResponse.setStatusCode(200);
+        httpResponse.setResponseLine(request.getHttpVersion(), 200);
         ContentType contentType = getContentTypeByPath(request.getPath());
         httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
         byte[] body = readFileByte(BASE_PATH + request.getPath()).getBytes();
@@ -64,7 +63,6 @@ public class RequestHandler implements Runnable {
         }
         return sb.toString();
     }
-
     public ContentType getContentTypeByPath(String path) {
         String ext = path.substring(path.lastIndexOf(".") + 1).toUpperCase();
         for (ContentType type : ContentType.values()) {
@@ -82,8 +80,7 @@ public class RequestHandler implements Runnable {
 
         // 데이터가 포함되어있는 url을 브라우저의 주소창에서 제거하기 위함입니다.
         // 302가 아니라 307을 선택한 이유는, 아직은 굳이 클라이언트의 요청메소드를 바꾸지 않는게 좋을 것 같기 때문입니다.
-        httpResponse.setVersion(request.getHttpVersion());
-        httpResponse.setStatusCode(307);
+        httpResponse.setResponseLine(request.getHttpVersion(),  307);
         httpResponse.addHeader("Location", "/index.html");
         httpResponse.sendResponse(dos);
     }
