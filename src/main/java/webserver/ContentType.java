@@ -7,7 +7,8 @@ public enum ContentType {
     ICO("image/x-icon"),
     JS("text/javascript"),
     PNG("image/png"),
-    JPEG("image/jpeg");
+    JPEG("image/jpeg"),
+    JPG("image/jpeg");
     private String contentTypeMsg;
     ContentType(String contentTypeMsg) {
         this.contentTypeMsg = contentTypeMsg;
