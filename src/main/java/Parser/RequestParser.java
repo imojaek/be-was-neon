@@ -50,7 +50,7 @@ public class RequestParser {
     }
 
     private byte[] makeBody(BufferedReader br, Map<String, String> headers) throws IOException {
-        if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) == 0) {
+        if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
             int length = Integer.parseInt(headers.get("Content-Length"));
             char[] bodyChars = new char[length];
             br.read(bodyChars);

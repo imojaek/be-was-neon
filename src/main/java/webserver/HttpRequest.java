@@ -37,6 +37,10 @@ public class HttpRequest {
         return requestLine.getDataString();
     }
 
+    public byte[] getBody() {
+        return body;
+    }
+
     @Override
     public String toString() {
         try {
