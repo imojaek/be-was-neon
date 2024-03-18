@@ -35,19 +35,11 @@ class RequestLineParserTest {
     }
 
     @Test
-    @DisplayName("HTTP 요청 path의 확장자가 없는 경우 path의 끝에 /index.html이 붙어있다.")
+    @DisplayName("HTTP 요청 path가 폴더 형태인 경우에도, 그대로 path에 저장된다.")
     void parsePathWithIndex_NoExtension() {
         String request = "GET /main HTTP/1.1";
         RequestLine requestLine = requestLineParser.parse(request);
-        assertThat(requestLine.getPath()).isEqualTo("/main/index.html");
-    }
-
-    @Test
-    @DisplayName("HTTP 요청 path가 폴더인 경우 path/index.html 형태로 저장된다.")
-    void parsePathWithIndex_EndWithSlash() {
-        String request = "GET /main/ HTTP/1.1";
-        RequestLine requestLine = requestLineParser.parse(request);
-        assertThat(requestLine.getPath()).isEqualTo("/main/index.html");
+        assertThat(requestLine.getPath()).isEqualTo("/main");
     }
 
     @Test
