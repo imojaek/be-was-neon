@@ -1,5 +1,8 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,17 +12,22 @@ public class GetMethodHandler {
 
     private static final String BASE_PATH = "./src/main/resources/static";
     private final HttpResponse httpResponse = new HttpResponse();
+    private static final Logger logger = LoggerFactory.getLogger(GetMethodHandler.class);
 
 
     // sendFile이 실행되는 경우는 Method가 GET이고, Target이 특정한 동작을 요구하지 않는 상황인 경우입니다.
-    public HttpResponse sendFileResponse(DataOutputStream dos, HttpRequest request) throws IOException {
-        httpResponse.setResponseLine(request.getHttpVersion(), 200);
-        ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
-        httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
-        byte[] body = readFileByte(modifyRequsetPath(request));
-        httpResponse.setBody(body);
-
-        return httpResponse;
+    public HttpResponse sendFileResponse(DataOutputStream dos, HttpRequest request){
+        try {
+            httpResponse.setResponseLine(request.getHttpVersion(), 200);
+            ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
+            httpResponse.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
+            byte[] body = readFileByte(modifyRequsetPath(request));
+            httpResponse.setBody(body);
+            return httpResponse;
+        } catch (IOException e) {
+            logger.error("파일을 읽던 중 오류가 발생했습니다. : " + e.getMessage());
+            return set404ErrorResponse(request);
+        }
     }
 
     private String modifyRequsetPath(HttpRequest request) {
@@ -52,5 +60,11 @@ public class GetMethodHandler {
             }
         }
         throw new IllegalArgumentException("Invalid file extension. : " + path); //  지원하지 않는 확장자인 경우.
+    }
+
+    private HttpResponse set404ErrorResponse(HttpRequest request) {
+        HttpResponse response = new HttpResponse();
+        response.setResponseLine(request.getHttpVersion(), 404);
+        return response;
     }
 }
