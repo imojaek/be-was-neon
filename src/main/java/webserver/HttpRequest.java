@@ -24,6 +24,9 @@ public class HttpRequest {
     public RequestLine getRequestLine() {
         return requestLine;
     }
+    public String getMethod() {
+        return requestLine.getMethod();
+    }
 
     public String getHttpVersion() {
         return requestLine.getVersion();
@@ -31,10 +34,6 @@ public class HttpRequest {
 
     public String getPath() {
         return requestLine.getPath();
-    }
-
-    public String getDataString() {
-        return requestLine.getDataString();
     }
 
     public byte[] getBody() {

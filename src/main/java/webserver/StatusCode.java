@@ -2,6 +2,7 @@ package webserver;
 
 public enum StatusCode {
     OK(200, "OK"),
+    FOUND(302, "Found"),
     TEMP_REDIRECT(307, "Temporary Redirect"),
     NOT_FOUND(404, "Not Found");
     private int statusCode;
