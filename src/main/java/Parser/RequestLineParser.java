@@ -17,16 +17,7 @@ public class RequestLineParser {
         if (path.contains("?")) {
             return path.substring(0, path.indexOf("?"));
         }
-        return parsePathWithIndex(path);
-    }
-
-    // 요청받은 path가 파일이 아닌 경우에, path 경로의 index.html 을 반환한다.
-    private String parsePathWithIndex(String path) {
-        if (path.endsWith("/"))
-            return path + "index.html";
-        if (path.contains("."))
-            return path;
-        return path + "/index.html";
+        return path;
     }
 
     private String parseDataString(String path) {
