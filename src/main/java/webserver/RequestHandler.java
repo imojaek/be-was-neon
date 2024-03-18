@@ -13,7 +13,6 @@ import java.net.Socket;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
-    private final HttpResponse httpResponse = new HttpResponse();
     private final RequestParser requestParser = new RequestParser();
 
     public RequestHandler(Socket connectionSocket) {
@@ -30,24 +29,32 @@ public class RequestHandler implements Runnable {
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
             // 이 아래로 요청에 대한 처리.
-            actionByMethod(dos, httpRequest);
+            HttpResponse response = actionByMethod(dos, httpRequest);
+
+            response.sendResponse(dos);
 
         } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void actionByMethod(DataOutputStream dos, HttpRequest request) throws IOException {
+    private HttpResponse actionByMethod(DataOutputStream dos, HttpRequest request) throws IOException {
         if (request.getMethod().equals("GET")) {
             GetMethodHandler getHandler = new GetMethodHandler();
-            getHandler.sendFileResponse(dos, request, httpResponse);
-            return;
+            return getHandler.sendFileResponse(dos, request);
         }
         else if (request.getMethod().equals("POST")) {
-            PostMethodHandler postHandler = new PostMethodHandler(httpResponse);
-            postHandler.actionByPath(dos, request);
-            return ;
+            PostMethodHandler postHandler = new PostMethodHandler();
+            return postHandler.actionByPath(dos, request);
         }
         logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
+        return set404ErrorResponse(request);
+    }
+
+    // 404error
+    private HttpResponse set404ErrorResponse(HttpRequest request) {
+        HttpResponse response = new HttpResponse();
+        response.setResponseLine(request.getHttpVersion(), 404);
+        return response;
     }
 }

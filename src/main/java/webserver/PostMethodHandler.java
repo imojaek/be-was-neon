@@ -14,21 +14,22 @@ import java.util.function.BiConsumer;
 public class PostMethodHandler {
     private Map<String, BiConsumer<DataOutputStream, HttpRequest>> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
-    private final HttpResponse httpResponse;
+    private final HttpResponse httpResponse = new HttpResponse();
 
-    public PostMethodHandler(HttpResponse httpResponse) {
+    public PostMethodHandler() {
         makeActionMap();
-        this.httpResponse = httpResponse;
     }
 
-    public void actionByPath(DataOutputStream dos, HttpRequest request) {
+    public HttpResponse actionByPath(DataOutputStream dos, HttpRequest request) {
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
                 actionMap.get(definedPath).accept(dos, request);
-                return ;
+                return this.httpResponse;
             }
         }
         logger.error("POST 메시지에 해당하는 메소드가 없습니다.");
+        set404ErrorResponse(request);
+        return this.httpResponse;
     }
 
     private void addNewUser(DataOutputStream dos, HttpRequest request) throws IOException {
@@ -36,9 +37,7 @@ public class PostMethodHandler {
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
-        httpResponse.setResponseLine(request.getHttpVersion(),  302);
-        httpResponse.addHeader("Location", "/index.html");
-        httpResponse.sendResponse(dos);
+        setRedirectReponse(request, "/index.html");
     }
 
     private HashMap<String, String> parseDataString(String dataString) {
@@ -51,7 +50,6 @@ public class PostMethodHandler {
         return dataMap;
     }
 
-
     private Map<String, BiConsumer<DataOutputStream, HttpRequest>> makeActionMap() {
         actionMap.put("/user/create", (inputDos, inputRequest) -> {
             try {
@@ -61,5 +59,14 @@ public class PostMethodHandler {
             }
         });
         return actionMap;
+    }
+
+    private void setRedirectReponse(HttpRequest request, String path) {
+        httpResponse.setResponseLine(request.getHttpVersion(), 302);
+        httpResponse.addHeader("Location", path);
+    }
+
+    private void set404ErrorResponse(HttpRequest request) {
+        httpResponse.setResponseLine(request.getHttpVersion(), 404);
     }
 }
