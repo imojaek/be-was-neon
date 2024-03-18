@@ -13,6 +13,9 @@ public class RequestLine {
         this.version = version;
     }
 
+    public String getMethod() {
+        return method;
+    }
     public String getPath() {
         return path;
     }
