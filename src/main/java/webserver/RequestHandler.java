@@ -63,7 +63,7 @@ public class RequestHandler implements Runnable {
         return actionMap;
     }
 
-    // sendFile이 실행되는 경우는 Mothod가 GET이고, Target이 특정한 동작을 요구하지 않는 상황인 경우입니다.
+    // sendFile이 실행되는 경우는 Method가 GET이고, Target이 특정한 동작을 요구하지 않는 상황인 경우입니다.
     private void sendFile(DataOutputStream dos, HttpRequest request) throws IOException {
         httpResponse.setResponseLine(request.getHttpVersion(), 200);
         ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
@@ -106,7 +106,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void addNewUser(DataOutputStream dos, HttpRequest request) throws IOException {
-        HashMap<String, String> dataMap = parseDataString(request.getDataString());
+        HashMap<String, String> dataMap = parseDataString(new String(request.getBody(), "UTF-8"));
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
