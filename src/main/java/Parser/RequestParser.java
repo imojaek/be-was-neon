@@ -16,7 +16,7 @@ public class RequestParser {
         BufferedReader br = new BufferedReader(new InputStreamReader(request));
         RequestLine requestLine = requestLineParser.parse(br.readLine());
         Map<String, String> headers = makeHeader(br);
-        String body = makeBody(br, headers);
+        byte[] body = makeBody(br, headers);
 
         return new HttpRequest(requestLine, headers, body);
     }
@@ -49,13 +49,13 @@ public class RequestParser {
         return headerMap;
     }
 
-    private String makeBody(BufferedReader br, Map<String, String> headers) throws IOException {
-        if (headers.containsKey("Content-Length")) {
+    private byte[] makeBody(BufferedReader br, Map<String, String> headers) throws IOException {
+        if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) == 0) {
             int length = Integer.parseInt(headers.get("Content-Length"));
             char[] bodyChars = new char[length];
             br.read(bodyChars);
-            return new String(bodyChars);
+            return new String(bodyChars).getBytes();
         }
-        return "";
+        return new byte[0];
     }
 }
