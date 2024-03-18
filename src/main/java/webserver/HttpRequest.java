@@ -2,10 +2,7 @@ package webserver;
 
 import Parser.RequestLineParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +11,11 @@ import java.util.Map;
 public class HttpRequest {
     private RequestLine requestLine;
     private Map<String, String> header;
-    private String body;
+    private byte[] body;
 
-    public HttpRequest(RequestLine requestLine, Map<String, String> header, String body) {
+    private final String ENCODING = "UTF-8";
+
+    public HttpRequest(RequestLine requestLine, Map<String, String> header, byte[] body) {
         this.requestLine = requestLine;
         this.header = header;
         this.body = body;
@@ -40,6 +39,10 @@ public class HttpRequest {
 
     @Override
     public String toString() {
-        return requestLine.toString() + "\n" + header + "\n" + body;
+        try {
+            return requestLine.toString() + "\n" + header + "\n" + new String(body, ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
