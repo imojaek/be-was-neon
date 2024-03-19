@@ -26,6 +26,7 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
             HttpRequest httpRequest = requestParser.parse(in);
+           //  logRequest(httpRequest);
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
             // 이 아래로 요청에 대한 처리.
@@ -36,6 +37,10 @@ public class RequestHandler implements Runnable {
         } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void logRequest(HttpRequest request) {
+        logger.debug("Request : {}", request.toString());
     }
 
     private HttpResponse actionByMethod(DataOutputStream dos, HttpRequest request) throws IOException {

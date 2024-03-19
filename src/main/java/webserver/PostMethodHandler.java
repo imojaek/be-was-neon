@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,14 +43,16 @@ public class PostMethodHandler {
     }
 
     private void loginUser(DataOutputStream dos, HttpRequest request) {
-        if (authorizeUser(request)) {
+        String tmpsid = "123456";
+        if (isValidCredentials()) {
             setRedirectReponse(request, "/main/index.html");
+            httpResponse.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
             return ;
         }
         setRedirectReponse(request, "/index.html");
     }
 
-    private boolean authorizeUser(HttpRequest request) {
+    private boolean isValidCredentials() {
         User targetUser = Database.findUserById(dataMap.get("login_id"));
         if (targetUser != null && targetUser.getPassword().equals(dataMap.get("login_password"))) {
             return true;

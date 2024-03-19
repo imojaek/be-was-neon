@@ -3,14 +3,12 @@ package webserver;
 import Parser.RequestLineParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpRequest {
-    private RequestLine requestLine;
-    private Map<String, String> header;
+    private final RequestLine requestLine;
+    private final Map<String, String> header;
+    private final Optional<Map<String, String>> cookies;
     private byte[] body;
 
     private final String ENCODING = "UTF-8";
@@ -19,6 +17,21 @@ public class HttpRequest {
         this.requestLine = requestLine;
         this.header = header;
         this.body = body;
+        this.cookies = getCookies();
+    }
+
+    public Optional<Map<String, String>> getCookies() {
+        String cookieString = header.get("Cookie");
+        Map<String, String> tempCookies = new HashMap<>();
+        if (cookieString != null && !cookieString.isEmpty()) {
+            String[] cookiePair = cookieString.split(";");
+            for (String pair : cookiePair) {
+                String[] split = pair.split("=", 2);
+                tempCookies.put(split[0], split[1]);
+            }
+            return Optional.of(tempCookies);
+        }
+        return Optional.empty();
     }
 
     public RequestLine getRequestLine() {
