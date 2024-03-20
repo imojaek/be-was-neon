@@ -1,5 +1,6 @@
 package webserver;
 
+import Sessions.Session;
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
@@ -15,14 +16,16 @@ public class PostMethodHandler {
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
     private final HttpResponse httpResponse = new HttpResponse();
     private HashMap<String, String> dataMap;
+    private Session session;
 
 
     public PostMethodHandler() {
         makeActionMap();
     }
 
-    public HttpResponse actionByPath(HttpRequest request) throws UnsupportedEncodingException {
+    public HttpResponse actionByPath(HttpRequest request, Session session) throws UnsupportedEncodingException {
         dataMap = parseDataString(new String(request.getBody(), "UTF-8"));
+        this.session = session;
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
                 actionMap.get(definedPath).accept(request);
@@ -44,6 +47,8 @@ public class PostMethodHandler {
     private void loginUser(HttpRequest request) {
         String tmpsid = "123456";
         if (isValidCredentials()) {
+            User loginUser = Database.findUserById(dataMap.get("login_id"));
+            session.addSession(tmpsid, loginUser);
             setRedirectReponse(request, "/main/index.html");
             httpResponse.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
             return ;

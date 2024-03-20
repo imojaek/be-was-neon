@@ -15,6 +15,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
     private final RequestParser requestParser = new RequestParser();
+    private final Session session = new Session();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -29,9 +30,17 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = requestParser.parse(in);
            //  logRequest(httpRequest);
 
+            if (httpRequest.getPath().endsWith(".html") && hasCookie(httpRequest)) {
+                if (httpRequest.getCookies().isPresent()) {
+                    String sid = httpRequest.getCookies().get().get("sid");
+                    if (session.isValidSession(sid)) {
+                        logger.debug("현재 세션의 UserId : {}", session.getUserBySid(sid).getUserId());
+                    }
+                }
+            }
             logger.debug("Request : {}", httpRequest.getRequestLine());
-            // 요청에 대한 처리.
-            HttpResponse response = actionByMethod(httpRequest);
+            // 요청에 대한 처리
+            HttpResponse response = actionByMethod(httpRequest, session);
 
             // 서버의 처리로 나온 HTTP 응답을 발송한다.
             response.sendResponse(dos);
@@ -44,15 +53,18 @@ public class RequestHandler implements Runnable {
     private void logRequest(HttpRequest request) {
         logger.debug("Request : {}", request.toString());
     }
+    private boolean hasCookie(HttpRequest request) {
+        return request.getCookies().isPresent();
+    }
 
-    private HttpResponse actionByMethod(HttpRequest request) throws IOException {
+    private HttpResponse actionByMethod(HttpRequest request, Session session) throws IOException {
         if (request.getMethod().equals("GET")) {
             GetMethodHandler getHandler = new GetMethodHandler();
             return getHandler.sendFileResponse(request);
         }
         else if (request.getMethod().equals("POST")) {
             PostMethodHandler postHandler = new PostMethodHandler();
-            return postHandler.actionByPath(request);
+            return postHandler.actionByPath(request, session);
         }
         logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
         return set404ErrorResponse(request);

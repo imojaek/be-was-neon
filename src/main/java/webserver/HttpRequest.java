@@ -1,7 +1,5 @@
 package webserver;
 
-import Parser.RequestLineParser;
-
 import java.io.*;
 import java.util.*;
 
@@ -17,10 +15,10 @@ public class HttpRequest {
         this.requestLine = requestLine;
         this.header = header;
         this.body = body;
-        this.cookies = getCookies();
+        this.cookies = makeCookies();
     }
 
-    public Optional<Map<String, String>> getCookies() {
+    private Optional<Map<String, String>> makeCookies() {
         String cookieString = header.get("Cookie");
         Map<String, String> tempCookies = new HashMap<>();
         if (cookieString != null && !cookieString.isEmpty()) {
@@ -48,9 +46,12 @@ public class HttpRequest {
     public String getPath() {
         return requestLine.getPath();
     }
-
     public byte[] getBody() {
         return body;
+    }
+
+    public Optional<Map<String, String>> getCookies() {
+        return cookies;
     }
 
     @Override
