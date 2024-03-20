@@ -5,14 +5,13 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class PostMethodHandler {
-    private Map<String, BiConsumer<DataOutputStream, HttpRequest>> actionMap = new HashMap<>();
+    private final Map<String, Consumer<HttpRequest>> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
     private final HttpResponse httpResponse = new HttpResponse();
     private HashMap<String, String> dataMap;
@@ -22,11 +21,11 @@ public class PostMethodHandler {
         makeActionMap();
     }
 
-    public HttpResponse actionByPath(DataOutputStream dos, HttpRequest request) throws UnsupportedEncodingException {
+    public HttpResponse actionByPath(HttpRequest request) throws UnsupportedEncodingException {
         dataMap = parseDataString(new String(request.getBody(), "UTF-8"));
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
-                actionMap.get(definedPath).accept(dos, request);
+                actionMap.get(definedPath).accept(request);
                 return this.httpResponse;
             }
         }
@@ -35,14 +34,14 @@ public class PostMethodHandler {
         return this.httpResponse;
     }
 
-    private void addNewUser(DataOutputStream dos, HttpRequest request) {
+    private void addNewUser(HttpRequest request) {
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
         setRedirectReponse(request, "/index.html");
     }
 
-    private void loginUser(DataOutputStream dos, HttpRequest request) {
+    private void loginUser(HttpRequest request) {
         String tmpsid = "123456";
         if (isValidCredentials()) {
             setRedirectReponse(request, "/main/index.html");
@@ -70,14 +69,9 @@ public class PostMethodHandler {
         return dataMap;
     }
 
-    private Map<String, BiConsumer<DataOutputStream, HttpRequest>> makeActionMap() {
-        actionMap.put("/user/create", (inputDos, inputRequest) -> {
-            addNewUser(inputDos, inputRequest);
-        });
-        actionMap.put("/user/login", (inputDos, inputRequest) -> {
-            loginUser(inputDos, inputRequest);
-        });
-        return actionMap;
+    private void makeActionMap() {
+        actionMap.put("/user/create", this::addNewUser);
+        actionMap.put("/user/login", this::loginUser);
     }
 
     private void setRedirectReponse(HttpRequest request, String path) {

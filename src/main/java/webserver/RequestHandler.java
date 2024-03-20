@@ -1,6 +1,7 @@
 package webserver;
 
 import Parser.RequestParser;
+import Sessions.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,10 @@ public class RequestHandler implements Runnable {
            //  logRequest(httpRequest);
 
             logger.debug("Request : {}", httpRequest.getRequestLine());
-            // 이 아래로 요청에 대한 처리.
-            HttpResponse response = actionByMethod(dos, httpRequest);
+            // 요청에 대한 처리.
+            HttpResponse response = actionByMethod(httpRequest);
 
+            // 서버의 처리로 나온 HTTP 응답을 발송한다.
             response.sendResponse(dos);
 
         } catch (IOException | IllegalArgumentException e) {
@@ -43,14 +45,14 @@ public class RequestHandler implements Runnable {
         logger.debug("Request : {}", request.toString());
     }
 
-    private HttpResponse actionByMethod(DataOutputStream dos, HttpRequest request) throws IOException {
+    private HttpResponse actionByMethod(HttpRequest request) throws IOException {
         if (request.getMethod().equals("GET")) {
             GetMethodHandler getHandler = new GetMethodHandler();
-            return getHandler.sendFileResponse(dos, request);
+            return getHandler.sendFileResponse(request);
         }
         else if (request.getMethod().equals("POST")) {
             PostMethodHandler postHandler = new PostMethodHandler();
-            return postHandler.actionByPath(dos, request);
+            return postHandler.actionByPath(request);
         }
         logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
         return set404ErrorResponse(request);
