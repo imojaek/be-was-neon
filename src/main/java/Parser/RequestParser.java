@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class RequestParser {
     private final RequestLineParser requestLineParser = new RequestLineParser();
+    private static final int BUFFER_SIZE = 10000;
 
     public HttpRequest parse(InputStream request) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(request));
@@ -50,11 +51,17 @@ public class RequestParser {
     }
 
     private byte[] makeBody(BufferedReader br, Map<String, String> headers) throws IOException {
+        StringBuilder sb = new StringBuilder();
         if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
-            int length = Integer.parseInt(headers.get("Content-Length"));
-            char[] bodyChars = new char[length];
-            br.read(bodyChars);
-            return new String(bodyChars).getBytes();
+            char[] buf = new char[BUFFER_SIZE];
+            int contentLength = Integer.parseInt(headers.get("Content-Length"));
+            while (contentLength > 0) {
+                int readlen = Math.min(contentLength, BUFFER_SIZE);
+                int len = br.read(buf, 0, readlen);
+                sb.append(buf, 0, len);
+                contentLength -= len;
+            }
+            return sb.toString().getBytes();
         }
         return new byte[0];
     }
