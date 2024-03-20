@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class PostMethodHandler {
     private final Map<String, Consumer<HttpRequest>> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
-    private final HttpResponse httpResponse = new HttpResponse();
+    private final HttpResponseManager httpResponseManager = new HttpResponseManager();
     private HashMap<String, String> dataMap;
     private Session session;
 
@@ -30,19 +30,19 @@ public class PostMethodHandler {
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
                 actionMap.get(definedPath).accept(request);
-                return this.httpResponse;
+                return httpResponseManager.getHttpResponse();
             }
         }
         logger.error("POST 메시지에 해당하는 메소드가 없습니다.");
-        set404ErrorResponse(request);
-        return this.httpResponse;
+        httpResponseManager.set404ErrorResponse(request);
+        return httpResponseManager.getHttpResponse();
     }
 
     private void addNewUser(HttpRequest request) {
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
-        setRedirectReponse(request, "/index.html");
+        httpResponseManager.setRedirectReponse(request, "/index.html");
     }
 
     private void loginUser(HttpRequest request) {
@@ -50,11 +50,11 @@ public class PostMethodHandler {
         if (isValidCredentials()) {
             User loginUser = Database.findUserById(dataMap.get("login_id"));
             session.addSession(tmpsid, loginUser);
-            setRedirectReponse(request, "/main/index.html");
-            httpResponse.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
+            httpResponseManager.setRedirectReponse(request, "/main/index.html");
+            httpResponseManager.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
             return ;
         }
-        setRedirectReponse(request, "/login/login_failed.html");
+        httpResponseManager.setRedirectReponse(request, "/login/login_failed.html");
     }
 
     private boolean isValidCredentials() {
@@ -93,14 +93,5 @@ public class PostMethodHandler {
     private void makeActionMap() {
         actionMap.put("/user/create", this::addNewUser);
         actionMap.put("/user/login", this::loginUser);
-    }
-
-    private void setRedirectReponse(HttpRequest request, String path) {
-        httpResponse.setResponseLine(request.getHttpVersion(), 302);
-        httpResponse.addHeader("Location", path);
-    }
-
-    private void set404ErrorResponse(HttpRequest request) {
-        httpResponse.setResponseLine(request.getHttpVersion(), 404);
     }
 }
