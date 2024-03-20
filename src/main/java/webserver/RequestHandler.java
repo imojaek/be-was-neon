@@ -34,7 +34,7 @@ public class RequestHandler implements Runnable {
                 if (httpRequest.getCookies().isPresent()) {
                     String sid = httpRequest.getCookies().get().get("sid");
                     if (session.isValidSession(sid)) {
-                        logger.debug("현재 세션의 UserId : {}", session.getUserBySid(sid).getUserId());
+                        logger.debug("현재 세션의 UserId : {}, sid : {}", session.getUserBySid(sid).getUserId(), sid);
                     }
                 }
             }

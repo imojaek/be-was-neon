@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class PostMethodHandler {
@@ -45,7 +46,7 @@ public class PostMethodHandler {
     }
 
     private void loginUser(HttpRequest request) {
-        String tmpsid = "123456";
+        String tmpsid = makeRandomString();
         if (isValidCredentials()) {
             User loginUser = Database.findUserById(dataMap.get("login_id"));
             session.addSession(tmpsid, loginUser);
@@ -62,6 +63,21 @@ public class PostMethodHandler {
             return true;
         }
         return false;
+    }
+
+    private String makeRandomString() {
+        Random random = new Random();
+        StringBuilder randomString = new StringBuilder();
+        for (int i = 0; i < 20; i++) {
+            if (random.nextBoolean()) { // true : 알파벳, false : 숫자
+                randomString.append((char) (random.nextInt(26) + 65));
+            }
+            else {
+                randomString.append(random.nextInt(10));
+            }
+        }
+
+        return randomString.toString();
     }
 
     private HashMap<String, String> parseDataString(String dataString) {
