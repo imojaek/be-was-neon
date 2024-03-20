@@ -48,7 +48,7 @@ public class PostMethodHandler {
             httpResponse.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
             return ;
         }
-        setRedirectReponse(request, "/index.html");
+        setRedirectReponse(request, "/login/login_failed.html");
     }
 
     private boolean isValidCredentials() {
