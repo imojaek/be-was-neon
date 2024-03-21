@@ -1,10 +1,9 @@
 package webserver;
 
-import Sessions.Session;
+import sessions.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

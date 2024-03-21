@@ -1,6 +1,6 @@
 package webserver;
 
-import Sessions.Session;
+import sessions.Session;
 import db.Database;
 import model.User;
 import org.slf4j.Logger;

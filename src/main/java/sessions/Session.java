@@ -1,4 +1,4 @@
-package Sessions;
+package sessions;
 
 import model.User;
 

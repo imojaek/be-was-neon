@@ -1,4 +1,4 @@
-package Parser;
+package parser;
 
 import webserver.HttpRequest;
 import webserver.RequestLine;

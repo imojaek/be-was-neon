@@ -1,7 +1,7 @@
 package webserver;
 
-import Parser.RequestParser;
-import Sessions.Session;
+import parser.RequestParser;
+import sessions.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

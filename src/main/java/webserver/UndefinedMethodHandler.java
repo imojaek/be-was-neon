@@ -1,6 +1,6 @@
 package webserver;
 
-import Sessions.Session;
+import sessions.Session;
 
 public class UndefinedMethodHandler implements HttpRequestHandler {
     @Override
