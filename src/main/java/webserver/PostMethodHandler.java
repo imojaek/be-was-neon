@@ -6,26 +6,30 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public class PostMethodHandler {
+public class PostMethodHandler implements HttpRequestHandler {
     private final Map<String, Consumer<HttpRequest>> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
     private final HttpResponseManager httpResponseManager = new HttpResponseManager();
     private HashMap<String, String> dataMap;
     private Session session;
 
-
     public PostMethodHandler() {
         makeActionMap();
     }
 
-    public HttpResponse actionByPath(HttpRequest request, Session session) throws UnsupportedEncodingException {
-        dataMap = parseDataString(new String(request.getBody(), "UTF-8"));
+    @Override
+    public HttpResponse getResponse(HttpRequest request, Session session) {
+        return actionByPath(request, session);
+    }
+
+    public HttpResponse actionByPath(HttpRequest request, Session session){
+        dataMap = parseDataString(new String(request.getBody(), StandardCharsets.UTF_8));
         this.session = session;
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {

@@ -58,16 +58,18 @@ public class RequestHandler implements Runnable {
     }
 
     private HttpResponse actionByMethod(HttpRequest request, Session session) throws IOException {
+        HttpRequestHandler httpRequestHandler;
         if (request.getMethod().equals("GET")) {
-            GetMethodHandler getHandler = new GetMethodHandler();
-            return getHandler.sendFileResponse(request);
+            httpRequestHandler = new GetMethodHandler();
         }
         else if (request.getMethod().equals("POST")) {
-            PostMethodHandler postHandler = new PostMethodHandler();
-            return postHandler.actionByPath(request, session);
+            httpRequestHandler = new PostMethodHandler();
         }
-        logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
-        return set404ErrorResponse(request);
+        else {
+            httpRequestHandler = new UndefinedMethodHandler();
+            logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
+        }
+        return httpRequestHandler.getResponse(request, session);
     }
 
     // 404error
