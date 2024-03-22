@@ -15,12 +15,12 @@ public class GetMethodHandler implements HttpRequestHandler{
     private static final Logger logger = LoggerFactory.getLogger(GetMethodHandler.class);
 
     @Override
-    public HttpResponse getResponse(HttpRequest request, Session session) {
-        return sendFileResponse(request, session);
+    public HttpResponse getResponse(HttpRequest request) {
+        return sendFileResponse(request);
     }
 
     // sendFile이 실행되는 경우는 Method가 GET이고, Target이 특정한 동작을 요구하지 않는 상황인 경우입니다.
-    public HttpResponse sendFileResponse(HttpRequest request, Session session){
+    public HttpResponse sendFileResponse(HttpRequest request){
         try {
             httpResponseManager.setResponseLine(request.getHttpVersion(), 200);
             ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.

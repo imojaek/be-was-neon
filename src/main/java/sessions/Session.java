@@ -4,17 +4,18 @@ import model.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Session {
-    private static Map<String, User> sessionMap = new HashMap<>();
+    private static final Map<String, User> sessionMap = new ConcurrentHashMap<>();
 
-    public void addSession(String sid, User user) {
+    public static void addSession(String sid, User user) {
         sessionMap.put(sid, user);
     }
-    public boolean isValidSession(String sid) {
+    public static boolean isValidSession(String sid) {
         return sessionMap.containsKey(sid);
     }
-    public User getUserBySid(String sid) {
+    public static User getUserBySid(String sid) {
         return sessionMap.get(sid);
     }
 }
