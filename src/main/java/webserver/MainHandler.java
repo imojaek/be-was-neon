@@ -33,7 +33,6 @@ public class MainHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
             HttpRequest httpRequest = requestParser.parse(in);
-           //  logRequest(httpRequest);
 
             if (httpRequest.getPath().endsWith(".html") && hasCookie(httpRequest)) {
                 if (httpRequest.getCookies().isPresent()) {

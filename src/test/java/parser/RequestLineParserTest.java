@@ -65,6 +65,6 @@ class RequestLineParserTest {
         RequestParser requestParser = new RequestParser();
         HttpRequest httpRequest = requestParser.parse(inputStream);
 
-        assertThat(new String(httpRequest.getBody(), "UTF-8")).isEqualTo("StringBody");
+        assertThat(new String(httpRequest.getBodyContent(), "UTF-8")).isEqualTo("StringBody");
     }
 }
