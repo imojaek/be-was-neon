@@ -17,12 +17,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class RequestHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+public class MainHandler implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(MainHandler.class);
     private final Socket connection;
     private final RequestParser requestParser = new RequestParser();
 
-    public RequestHandler(Socket connectionSocket) {
+    public MainHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
 
@@ -55,9 +55,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void logRequest(HttpRequest request) {
-        logger.debug("Request : {}", request.toString());
-    }
     private boolean hasCookie(HttpRequest request) {
         return request.getCookies().isPresent();
     }
