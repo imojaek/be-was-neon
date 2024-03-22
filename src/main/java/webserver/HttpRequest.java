@@ -1,15 +1,17 @@
 package webserver;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class HttpRequest {
     private final RequestLine requestLine;
     private final Map<String, String> header;
     private final Optional<Map<String, String>> cookies;
-    private byte[] body;
+    private final byte[] body;
+    private Map<String, String> bodyDataMap = null;
 
-    private final String ENCODING = "UTF-8";
+    private static final String ENCODING = "UTF-8";
 
     public HttpRequest(RequestLine requestLine, Map<String, String> header, byte[] body) {
         this.requestLine = requestLine;
@@ -18,6 +20,22 @@ public class HttpRequest {
         this.cookies = makeCookies();
     }
 
+    public Map<String, String> getBodyDataMap() {
+        if (bodyDataMap == null) {
+            bodyDataMap = makeBodyData(new String(getBody(), StandardCharsets.UTF_8));
+        }
+        return bodyDataMap;
+    }
+
+    private HashMap<String, String> makeBodyData(String dataString) {
+        HashMap<String, String> dataMap = new HashMap<>();
+        String[] datas = dataString.split("&");
+        for (String data : datas) {
+            String[] splitData = data.split("=");
+            dataMap.put(splitData[0], splitData[1]);
+        }
+        return dataMap;
+    }
     private Optional<Map<String, String>> makeCookies() {
         String cookieString = header.get("Cookie");
         Map<String, String> tempCookies = new HashMap<>();
