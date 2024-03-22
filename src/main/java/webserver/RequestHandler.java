@@ -69,13 +69,6 @@ public class RequestHandler implements Runnable {
             httpRequestHandler = new UndefinedMethodHandler();
             logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
         }
-        return httpRequestHandler.getResponse(request, session);
-    }
-
-    // 404error
-    private HttpResponse set404ErrorResponse(HttpRequest request) {
-        HttpResponse response = new HttpResponse();
-        response.setResponseLine(request.getHttpVersion(), 404);
-        return response;
+        return httpRequestHandler.getResponse(request);
     }
 }
