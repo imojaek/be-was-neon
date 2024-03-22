@@ -1,7 +1,7 @@
 package parser;
 
-import webserver.HttpRequest;
-import webserver.RequestLine;
+import http.HttpRequest;
+import http.RequestLine;
 
 import java.io.*;
 import java.util.ArrayList;

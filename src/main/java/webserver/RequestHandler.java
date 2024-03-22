@@ -1,5 +1,11 @@
 package webserver;
 
+import handler.GetMethodHandler;
+import handler.HttpRequestHandler;
+import handler.PostMethodHandler;
+import handler.UndefinedMethodHandler;
+import http.HttpRequest;
+import http.HttpResponse;
 import parser.RequestParser;
 import sessions.Session;
 import org.slf4j.Logger;
@@ -15,7 +21,6 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
     private final RequestParser requestParser = new RequestParser();
-    private final Session session = new Session();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -33,14 +38,14 @@ public class RequestHandler implements Runnable {
             if (httpRequest.getPath().endsWith(".html") && hasCookie(httpRequest)) {
                 if (httpRequest.getCookies().isPresent()) {
                     String sid = httpRequest.getCookies().get().get("sid");
-                    if (session.isValidSession(sid)) {
-                        logger.debug("현재 세션의 UserId : {}, sid : {}", session.getUserBySid(sid).getUserId(), sid);
+                    if (Session.isValidSession(sid)) {
+                        logger.debug("현재 세션의 UserId : {}, sid : {}", Session.getUserBySid(sid).getUserId(), sid);
                     }
                 }
             }
             logger.debug("Request : {}", httpRequest.getRequestLine());
             // 요청에 대한 처리
-            HttpResponse response = actionByMethod(httpRequest, session);
+            HttpResponse response = actionByMethod(httpRequest);
 
             // 서버의 처리로 나온 HTTP 응답을 발송한다.
             response.sendResponse(dos);
@@ -57,7 +62,7 @@ public class RequestHandler implements Runnable {
         return request.getCookies().isPresent();
     }
 
-    private HttpResponse actionByMethod(HttpRequest request, Session session) throws IOException {
+    private HttpResponse actionByMethod(HttpRequest request) throws IOException {
         HttpRequestHandler httpRequestHandler;
         if (request.getMethod().equals("GET")) {
             httpRequestHandler = new GetMethodHandler();

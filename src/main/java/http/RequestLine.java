@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 public class RequestLine {
     private final String method;

@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 public class HttpResponseManager {
     private HttpResponse httpResponse = new HttpResponse();

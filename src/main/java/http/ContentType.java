@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 public enum ContentType {
     HTML("text/html"),
@@ -9,7 +9,7 @@ public enum ContentType {
     PNG("image/png"),
     JPEG("image/jpeg"),
     JPG("image/jpeg");
-    private String contentTypeMsg;
+    private final String contentTypeMsg;
     ContentType(String contentTypeMsg) {
         this.contentTypeMsg = contentTypeMsg;
     }

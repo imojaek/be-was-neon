@@ -1,8 +1,11 @@
-package webserver;
+package handler;
 
-import sessions.Session;
+import http.HttpRequest;
+import http.HttpResponse;
+import http.HttpResponseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import http.ContentType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +28,7 @@ public class GetMethodHandler implements HttpRequestHandler{
             httpResponseManager.setResponseLine(request.getHttpVersion(), 200);
             ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
             httpResponseManager.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
-            byte[] body = readFileByte(modifyRequsetPath(request));
+            byte[] body = readFileByte(modifyRequestPath(request));
             httpResponseManager.setBody(body);
 
             return httpResponseManager.getHttpResponse();
@@ -37,7 +40,7 @@ public class GetMethodHandler implements HttpRequestHandler{
         }
     }
 
-    private String modifyRequsetPath(HttpRequest request) {
+    private String modifyRequestPath(HttpRequest request) {
         String requestPath = request.getPath();
         if (requestPath.endsWith("/")) {
             return BASE_PATH + requestPath + "index.html";

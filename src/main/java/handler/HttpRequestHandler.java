@@ -1,6 +1,7 @@
-package webserver;
+package handler;
 
-import sessions.Session;
+import http.HttpRequest;
+import http.HttpResponse;
 
 public interface HttpRequestHandler {
     public HttpResponse getResponse(HttpRequest request);

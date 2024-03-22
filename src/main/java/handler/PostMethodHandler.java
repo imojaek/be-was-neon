@@ -1,17 +1,13 @@
-package webserver;
+package handler;
 
-import sessions.Session;
-import db.Database;
-import model.User;
+import http.HttpRequest;
+import http.HttpResponse;
+import http.HttpResponseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.function.Consumer;
 
 public class PostMethodHandler implements HttpRequestHandler {
     private final Map<String, Action> actionMap = new HashMap<>();

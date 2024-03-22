@@ -1,6 +1,6 @@
 package parser;
 
-import webserver.RequestLine;
+import http.RequestLine;
 
 public class RequestLineParser {
 
