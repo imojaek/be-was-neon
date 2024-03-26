@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,10 +29,14 @@ public class RequestParser {
         List<Byte> byteList = new ArrayList<>();
         if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
             int contentLength = Integer.parseInt(headers.get("Content-Length"));
-            int data;
-            while (contentLength > 0 && (data = bis.read()) != -1) {
-                byteList.add((byte) data);
-                contentLength--;
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int readLength = Math.min(BUFFER_SIZE, contentLength);
+            while(contentLength > 0) {
+                int read = bis.read(buffer, 0, readLength);
+                contentLength -= read;
+                for (int i = 0; i < read; i++) {
+                    byteList.add(buffer[i]);
+                }
             }
             byte[] result = new byte[byteList.size()];
             for (int i = 0; i < byteList.size(); i++) {
