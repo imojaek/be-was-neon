@@ -2,42 +2,87 @@ package parser;
 
 import http.HttpRequest;
 import http.RequestLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RequestParser {
     private final RequestLineParser requestLineParser = new RequestLineParser();
+    private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
     private static final int BUFFER_SIZE = 10000;
 
+
     public HttpRequest parse(InputStream request) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(request));
-        RequestLine requestLine = requestLineParser.parse(br.readLine());
-        Map<String, String> headers = makeHeader(br);
-        byte[] body = makeBody(br, headers);
+        BufferedInputStream bis = new BufferedInputStream(request);
+        RequestLine requestLine = requestLineParser.parse(readRequestLine(bis));
+        Map<String, String> headers = makeHeader2(bis);
+        byte[] body = makeBody(bis, headers);
 
         return new HttpRequest(requestLine, headers, body);
     }
 
-    private Map<String, String> makeHeader(BufferedReader br) {
-        List<String> header = readHttpHeader(br);
-        return parseHeader(header);
+    private byte[] makeBody(BufferedInputStream bis, Map<String, String> headers) throws IOException {
+        List<Byte> byteList = new ArrayList<>();
+        if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
+            int contentLength = Integer.parseInt(headers.get("Content-Length"));
+            int data;
+            while (contentLength > 0 && (data = bis.read()) != -1) {
+                byteList.add((byte) data);
+                contentLength--;
+            }
+            byte[] result = new byte[byteList.size()];
+            for (int i = 0; i < byteList.size(); i++) {
+                result[i] = byteList.get(i);
+            }
+            return result;
+        }
+        return new byte[0];
     }
 
-    private List<String> readHttpHeader(BufferedReader br) {
-        List<String> result = new ArrayList<>();
-        String line;
-        try {
-            while ((line = br.readLine()) != null && !line.isEmpty()) {
-                result.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private Map<String, String> makeHeader2(BufferedInputStream bis) throws IOException {
+        List<byte[]> headerList = new ArrayList<>();
+
+        byte[] header;
+
+        while ((header = readLine(bis)).length != 0) {
+            headerList.add(header);
         }
 
+        List<String> lineList = headerList.stream()
+                                        .map(line -> new String(line, StandardCharsets.UTF_8))
+                                        .collect(Collectors.toList());
+
+        Map<String, String> resultMap = parseHeader(lineList);
+
+        return resultMap;
+    }
+
+    private String readRequestLine(BufferedInputStream bis) throws IOException {
+        byte[] line = readLine(bis);
+        return new String(line, StandardCharsets.UTF_8);
+    }
+
+    private byte[] readLine(BufferedInputStream bis) throws IOException {
+        List<Byte> bytes = new ArrayList<>();
+        int prevData = -1;
+        int data;
+        while ((data = bis.read()) != -1) {
+            if (prevData == '\r' && data == '\n') {
+                bytes.remove(bytes.size() - 1); // bytes에 들어있는 \r 을 제거한다.
+                break;
+            }
+            bytes.add((byte) data);
+            prevData = data;
+        }
+        byte[] result = new byte[bytes.size()];
+        for (int i = 0; i < bytes.size(); i++) {
+            result[i] = bytes.get(i);
+        }
         return result;
     }
 
@@ -48,21 +93,5 @@ public class RequestParser {
             headerMap.put(split[0], split[1].trim());
         }
         return headerMap;
-    }
-
-    private byte[] makeBody(BufferedReader br, Map<String, String> headers) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
-            char[] buf = new char[BUFFER_SIZE];
-            int contentLength = Integer.parseInt(headers.get("Content-Length"));
-            while (contentLength > 0) {
-                int readlen = Math.min(contentLength, BUFFER_SIZE);
-                int len = br.read(buf, 0, readlen);
-                sb.append(buf, 0, len);
-                contentLength -= len;
-            }
-            return sb.toString().getBytes();
-        }
-        return new byte[0];
     }
 }

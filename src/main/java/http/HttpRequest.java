@@ -22,7 +22,8 @@ public class HttpRequest {
 
     public Map<String, String> getBodyDataMap() {
         if (bodyDataMap == null) {
-            bodyDataMap = makeBodyData(new String(getBodyContent(), StandardCharsets.UTF_8));
+            String str = new String(getBodyContent(), StandardCharsets.UTF_8);
+            bodyDataMap = makeBodyData(str);
         }
         return bodyDataMap;
     }

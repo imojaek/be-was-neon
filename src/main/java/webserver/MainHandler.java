@@ -43,6 +43,7 @@ public class MainHandler implements Runnable {
                 }
             }
             logger.debug("Request : {}", httpRequest.getRequestLine());
+
             // 요청에 대한 처리
             HttpResponse response = actionByMethod(httpRequest);
 
