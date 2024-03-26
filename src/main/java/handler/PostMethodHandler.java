@@ -28,7 +28,7 @@ public class PostMethodHandler implements HttpRequestHandler {
                 return actionMap.get(definedPath).action(request);
             }
         }
-        logger.error("POST 메시지에 해당하는 메소드가 없습니다.");
+        logger.error("POST 메시지에 해당하는 메소드가 없습니다. : " + request.getRequestLine().toString());
         HttpResponseManager httpResponseManager = new HttpResponseManager();
         httpResponseManager.set404ErrorResponse(request);
         return httpResponseManager.getHttpResponse();
@@ -37,5 +37,6 @@ public class PostMethodHandler implements HttpRequestHandler {
     private void makeActionMap() {
         actionMap.put("/user/create", new CreateUserHandler());
         actionMap.put("/user/login", new LoginHandler());
+        actionMap.put("/user/logout", new LogoutHandler());
     }
 }

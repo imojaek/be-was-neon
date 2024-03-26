@@ -18,4 +18,7 @@ public class Session {
     public static User getUserBySid(String sid) {
         return sessionMap.get(sid);
     }
+    public static boolean deleteSession(String sid) {
+        return sessionMap.remove(sid) != null;
+    }
 }
