@@ -1,17 +1,21 @@
-package handler;
+package handler.get;
 
+import handler.Action;
 import http.ContentType;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sessions.Session;
+import utils.HtmlReplacer;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-public class SendFileHandler implements Action{
+public class SendFileHandler implements Action {
     private static final String BASE_PATH = "./src/main/resources/static";
     HttpResponseManager httpResponseManager = new HttpResponseManager();
     private static final Logger logger = LoggerFactory.getLogger(SendFileHandler.class);
@@ -28,6 +32,9 @@ public class SendFileHandler implements Action{
             ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
             httpResponseManager.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
             byte[] body = readFileByte(modifyRequestPath(request));
+            if (modifyRequestPath(request).equals(BASE_PATH + "/index.html")) {
+                body = refreshMainPage(request, body);
+            }
             httpResponseManager.setBody(body);
 
             return httpResponseManager.getHttpResponse();
@@ -37,6 +44,16 @@ public class SendFileHandler implements Action{
 
             return httpResponseManager.getHttpResponse();
         }
+    }
+
+    private byte[] refreshMainPage(HttpRequest request, byte[] body) {
+        if (!Session.isValidSession(request.getSessionId())) {
+            return body;
+        }
+        String bodyString = new String(body, StandardCharsets.UTF_8);
+        String userId = Session.getUserBySid(request.getSessionId()).getUserId();
+        bodyString = HtmlReplacer.replaceLoginButton(bodyString, "/user/list", userId + "님, 환영합니다!");
+        return bodyString.getBytes();
     }
 
     private String modifyRequestPath(HttpRequest request) {
