@@ -15,6 +15,10 @@ public class HttpResponseManager {
         httpResponse.addHeader(name, value);
     }
 
+    public void addCookie(String name, String value) {
+        httpResponse.addCookie(name, value);
+    }
+
     public void setRedirectReponse(HttpRequest request, String path) {
         httpResponse.setResponseLine(request.getHttpVersion(), 302);
         httpResponse.addHeader("Location", path);

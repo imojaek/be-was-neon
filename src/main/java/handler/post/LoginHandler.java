@@ -27,7 +27,8 @@ public class LoginHandler implements UrlRequestHandler {
             User loginUser = Database.findUserById(dataMap.get("login_id"));
             Session.addSession(tmpsid, loginUser);
             httpResponseManager.setRedirectReponse(request, "/main/index.html");
-            httpResponseManager.addHeader("Set-Cookie", "sid=" + tmpsid + "; path=/");
+            httpResponseManager.addCookie("sid", tmpsid);
+            httpResponseManager.addCookie("path", "/");
             return ;
         }
         httpResponseManager.setRedirectReponse(request, "/login/login_failed.html");

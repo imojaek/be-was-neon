@@ -47,6 +47,10 @@ public class HttpResponse {
         headers.addHeader(name, value);
     }
 
+    public void addCookie(String name, String value) {
+        headers.addCookie(name, value);
+    }
+
     public void setBody(byte[] bodyContent) {
         addHeader("Content-Length", String.valueOf(bodyContent.length));
         this.body = new Body(bodyContent);
