@@ -17,7 +17,7 @@ public class LogoutHandler implements Action{
 
     private void logoutUser(HttpRequest request) {
         if (request.getCookies().isPresent()) {
-            String sid = request.getCookies().get().get("sid");
+            String sid = request.getCookie("sid");
             if (Session.isValidSession(sid)) {
                 Session.deleteSession(sid);
                 httpResponseManager.setRedirectReponse(request, "/");

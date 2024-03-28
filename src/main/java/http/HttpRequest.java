@@ -73,6 +73,10 @@ public class HttpRequest {
         return cookies;
     }
 
+    public String getCookie(String key) {
+        return cookies.map(cookie -> cookie.get(key)).orElse("");
+    }
+
     @Override
     public String toString() {
         try {

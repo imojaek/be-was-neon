@@ -26,7 +26,7 @@ public class UserlistHandler implements Action{
 
     @Override
     public HttpResponse action(HttpRequest request) {
-        if (Session.isValidSession(request.getCookies().get().get("sid")))
+        if (Session.isValidSession(request.getCookie("sid")))
             return sendUserList(request);
         httpResponseManager.setRedirectReponse(request, "/");
         return httpResponseManager.getHttpResponse();
