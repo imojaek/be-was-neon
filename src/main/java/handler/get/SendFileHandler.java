@@ -1,6 +1,6 @@
 package handler.get;
 
-import handler.Action;
+import handler.UrlRequestHandler;
 import http.ContentType;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -15,13 +15,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class SendFileHandler implements Action {
+public class SendFileHandler implements UrlRequestHandler {
     private static final String BASE_PATH = "./src/main/resources/static";
     HttpResponseManager httpResponseManager = new HttpResponseManager();
     private static final Logger logger = LoggerFactory.getLogger(SendFileHandler.class);
 
     @Override
-    public HttpResponse action(HttpRequest request) {
+    public HttpResponse handle(HttpRequest request) {
         return sendFileResponse(request);
     }
 

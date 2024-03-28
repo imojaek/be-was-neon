@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetMethodHandler implements HttpRequestHandler{
-    private final Map<String, Action> actionMap = new HashMap<>();
+public class GetMethodHandler implements HttpMethodHandler {
+    private final Map<String, UrlRequestHandler> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GetMethodHandler.class);
 
     public GetMethodHandler() {
@@ -26,11 +26,11 @@ public class GetMethodHandler implements HttpRequestHandler{
     private HttpResponse actionByPath(HttpRequest request) {
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
-                return actionMap.get(definedPath).action(request);
+                return actionMap.get(definedPath).handle(request);
             }
         }
         // 지정된 Path로의 요청이 아닌 경우 해당 Path의 정적파일을 반환
-        return new SendFileHandler().action(request);
+        return new SendFileHandler().handle(request);
     }
 
     private void makeActionMap() {

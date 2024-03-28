@@ -1,7 +1,7 @@
 package handler.get;
 
 import db.Database;
-import handler.Action;
+import handler.UrlRequestHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
@@ -18,13 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.StringJoiner;
 
-public class UserlistHandler implements Action {
+public class UserlistHandler implements UrlRequestHandler {
     HttpResponseManager httpResponseManager = new HttpResponseManager();
     private static final String BASE_PATH = "./src/main/resources/static";
     private static final Logger logger = LoggerFactory.getLogger(UserlistHandler.class);
 
     @Override
-    public HttpResponse action(HttpRequest request) {
+    public HttpResponse handle(HttpRequest request) {
         if (Session.isValidSession(request.getSessionId()))
             return sendUserList(request);
         httpResponseManager.setRedirectReponse(request, "/");

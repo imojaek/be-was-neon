@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostMethodHandler implements HttpRequestHandler {
-    private final Map<String, Action> actionMap = new HashMap<>();
+public class PostMethodHandler implements HttpMethodHandler {
+    private final Map<String, UrlRequestHandler> actionMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(PostMethodHandler.class);
 
     public PostMethodHandler() {
@@ -28,7 +28,7 @@ public class PostMethodHandler implements HttpRequestHandler {
     public HttpResponse actionByPath(HttpRequest request){
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
-                return actionMap.get(definedPath).action(request);
+                return actionMap.get(definedPath).handle(request);
             }
         }
         logger.error("POST 메시지에 해당하는 메소드가 없습니다. : " + request.getRequestLine().toString());

@@ -1,7 +1,7 @@
 package webserver;
 
 import handler.GetMethodHandler;
-import handler.HttpRequestHandler;
+import handler.HttpMethodHandler;
 import handler.PostMethodHandler;
 import handler.UndefinedMethodHandler;
 import http.HttpRequest;
@@ -60,17 +60,17 @@ public class MainHandler implements Runnable {
     }
 
     private HttpResponse actionByMethod(HttpRequest request) throws IOException {
-        HttpRequestHandler httpRequestHandler;
+        HttpMethodHandler HttpMethodHandler;
         if (request.getMethod().equals("GET")) {
-            httpRequestHandler = new GetMethodHandler();
+            HttpMethodHandler = new GetMethodHandler();
         }
         else if (request.getMethod().equals("POST")) {
-            httpRequestHandler = new PostMethodHandler();
+            HttpMethodHandler = new PostMethodHandler();
         }
         else {
-            httpRequestHandler = new UndefinedMethodHandler();
+            HttpMethodHandler = new UndefinedMethodHandler();
             logger.error("정의되지 않은 HTTP메소드 : {}", request.getMethod());
         }
-        return httpRequestHandler.getResponse(request);
+        return HttpMethodHandler.getResponse(request);
     }
 }

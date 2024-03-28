@@ -1,16 +1,16 @@
 package handler.post;
 
-import handler.Action;
+import handler.UrlRequestHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 import sessions.Session;
 
-public class LogoutHandler implements Action {
+public class LogoutHandler implements UrlRequestHandler {
     HttpResponseManager httpResponseManager;
 
     @Override
-    public HttpResponse action(HttpRequest request) {
+    public HttpResponse handle(HttpRequest request) {
         httpResponseManager = new HttpResponseManager();
         logoutUser(request);
         return httpResponseManager.getHttpResponse();

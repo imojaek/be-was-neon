@@ -1,7 +1,7 @@
 package handler.post;
 
 import db.Database;
-import handler.Action;
+import handler.UrlRequestHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
@@ -11,10 +11,10 @@ import sessions.Session;
 import java.util.Map;
 import java.util.Random;
 
-public class LoginHandler implements Action {
+public class LoginHandler implements UrlRequestHandler {
     HttpResponseManager httpResponseManager;
     @Override
-    public HttpResponse action(HttpRequest request) {
+    public HttpResponse handle(HttpRequest request) {
         httpResponseManager = new HttpResponseManager();
         loginUser(request);
         return httpResponseManager.getHttpResponse();

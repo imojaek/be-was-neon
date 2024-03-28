@@ -1,7 +1,7 @@
 package handler.post;
 
 import db.Database;
-import handler.Action;
+import handler.UrlRequestHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class CreateUserHandler implements Action {
+public class CreateUserHandler implements UrlRequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(CreateUserHandler.class);
     private final HttpResponseManager httpResponseManager = new HttpResponseManager();
 
     @Override
-    public HttpResponse action(HttpRequest request) {
+    public HttpResponse handle(HttpRequest request) {
         addNewUser(request);
         return httpResponseManager.getHttpResponse();
     }

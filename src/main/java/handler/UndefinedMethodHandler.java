@@ -1,11 +1,10 @@
 package handler;
 
-import handler.HttpRequestHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 
-public class UndefinedMethodHandler implements HttpRequestHandler {
+public class UndefinedMethodHandler implements HttpMethodHandler {
     @Override
     public HttpResponse getResponse(HttpRequest request) {
         HttpResponseManager httpResponseManager = new HttpResponseManager();
