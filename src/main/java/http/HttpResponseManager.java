@@ -19,6 +19,10 @@ public class HttpResponseManager {
         httpResponse.addCookie(name, value);
     }
 
+    public void makeCookieExpired() {
+        httpResponse.makeCookieExpired();
+    }
+
     public void setRedirectReponse(HttpRequest request, String path) {
         httpResponse.setResponseLine(request.getHttpVersion(), 302);
         httpResponse.addHeader("Location", path);

@@ -51,6 +51,10 @@ public class HttpResponse {
         headers.addCookie(name, value);
     }
 
+    public void makeCookieExpired() {
+        headers.addCookie("Max-Age",  "0");
+    }
+
     public void setBody(byte[] bodyContent) {
         addHeader("Content-Length", String.valueOf(bodyContent.length));
         this.body = new Body(bodyContent);
