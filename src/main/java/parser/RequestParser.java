@@ -93,7 +93,7 @@ public class RequestParser {
         Map<String, String> headerMap = new HashMap<>();
         for (String headerInfo : header) {
             String[] split = headerInfo.split(":", 2);
-            headerMap.put(split[0], split[1].trim());
+            headerMap.put(split[0].trim(), split[1].trim());
         }
         return headerMap;
     }

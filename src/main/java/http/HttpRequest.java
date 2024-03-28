@@ -44,7 +44,7 @@ public class HttpRequest {
             String[] cookiePair = cookieString.split(";");
             for (String pair : cookiePair) {
                 String[] split = pair.split("=", 2);
-                tempCookies.put(split[0], split[1]);
+                tempCookies.put(split[0].trim(), split[1]);  // 하나의 쿠키에 속성이 여러가지일 경우 세미콜론과 공백으로 구분된다.
             }
             return Optional.of(tempCookies);
         }
