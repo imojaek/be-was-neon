@@ -73,8 +73,8 @@ public class HttpRequest {
         return cookies;
     }
 
-    public String getCookie(String key) {
-        return cookies.map(cookie -> cookie.get(key)).orElse("");
+    public String getSessionId() {
+        return cookies.map(cookie -> cookie.get("sid")).orElse("");
     }
 
     @Override

@@ -1,5 +1,8 @@
 package handler;
 
+import handler.post.CreateUserHandler;
+import handler.post.LoginHandler;
+import handler.post.LogoutHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;

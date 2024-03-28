@@ -36,7 +36,7 @@ public class MainHandler implements Runnable {
 
             if (httpRequest.getPath().endsWith(".html") && hasCookie(httpRequest)) {
                 if (httpRequest.getCookies().isPresent()) {
-                    String sid = httpRequest.getCookie("sid");
+                    String sid = httpRequest.getSessionId();
                     if (Session.isValidSession(sid)) {
                         logger.debug("현재 세션의 UserId : {}, sid : {}", Session.getUserBySid(sid).getUserId(), sid);
                     }

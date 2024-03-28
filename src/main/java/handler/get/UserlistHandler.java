@@ -1,10 +1,10 @@
-package handler;
+package handler.get;
 
 import db.Database;
+import handler.Action;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
-import http.StatusCode;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,21 +13,19 @@ import utils.HtmlReplacer;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.List;
 import java.util.StringJoiner;
 
-public class UserlistHandler implements Action{
+public class UserlistHandler implements Action {
     HttpResponseManager httpResponseManager = new HttpResponseManager();
     private static final String BASE_PATH = "./src/main/resources/static";
     private static final Logger logger = LoggerFactory.getLogger(UserlistHandler.class);
 
     @Override
     public HttpResponse action(HttpRequest request) {
-        if (Session.isValidSession(request.getCookie("sid")))
+        if (Session.isValidSession(request.getSessionId()))
             return sendUserList(request);
         httpResponseManager.setRedirectReponse(request, "/");
         return httpResponseManager.getHttpResponse();

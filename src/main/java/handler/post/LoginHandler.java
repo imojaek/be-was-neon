@@ -1,6 +1,7 @@
-package handler;
+package handler.post;
 
 import db.Database;
+import handler.Action;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;

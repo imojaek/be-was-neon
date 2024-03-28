@@ -1,15 +1,12 @@
 package handler;
 
+import handler.get.SendFileHandler;
+import handler.get.UserlistHandler;
 import http.HttpRequest;
 import http.HttpResponse;
-import http.HttpResponseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import http.ContentType;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

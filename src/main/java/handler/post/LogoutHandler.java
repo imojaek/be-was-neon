@@ -1,11 +1,12 @@
-package handler;
+package handler.post;
 
+import handler.Action;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 import sessions.Session;
 
-public class LogoutHandler implements Action{
+public class LogoutHandler implements Action {
     HttpResponseManager httpResponseManager;
 
     @Override
@@ -17,7 +18,7 @@ public class LogoutHandler implements Action{
 
     private void logoutUser(HttpRequest request) {
         if (request.getCookies().isPresent()) {
-            String sid = request.getCookie("sid");
+            String sid = request.getSessionId();
             if (Session.isValidSession(sid)) {
                 Session.deleteSession(sid);
                 httpResponseManager.setRedirectReponse(request, "/");
