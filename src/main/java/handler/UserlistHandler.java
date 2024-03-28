@@ -9,6 +9,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sessions.Session;
+import utils.HtmlReplacer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,8 +38,9 @@ public class UserlistHandler implements Action{
             byte[] html = readFileByte(BASE_PATH + "/user/list.html");
             String htmlString = new String(html, StandardCharsets.UTF_8);
             String table = makeTable();
-            htmlString = htmlString.replace("{{{TABLE}}}", table);
-            byte[] body = htmlString.getBytes();
+            String resultHtml = HtmlReplacer.replaceTable(htmlString, table);
+            byte[] body = resultHtml.getBytes();
+
             httpResponseManager.setResponseLine(request.getHttpVersion(), 200);
             httpResponseManager.addHeader("Content-Type", "text/html");
             httpResponseManager.setBody(body);
