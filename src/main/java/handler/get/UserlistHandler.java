@@ -27,7 +27,7 @@ public class UserlistHandler implements UrlRequestHandler {
     public HttpResponse handle(HttpRequest request) {
         if (Session.isValidSession(request.getSessionId()))
             return sendUserList(request);
-        httpResponseManager.setRedirectReponse(request, "/");
+        httpResponseManager.setRedirectReponse(request, "/login");
         return httpResponseManager.getHttpResponse();
     }
 
