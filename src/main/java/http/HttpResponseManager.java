@@ -2,6 +2,11 @@ package http;
 
 public class HttpResponseManager {
     private HttpResponse httpResponse = new HttpResponse();
+    private static final String BASE_HTTP_VERSION = "HTTP/1.1";
+
+    public HttpResponse getHttpResponse() {
+        return httpResponse;
+    }
 
     public void setResponseLine(String httpVersion, int statusCode) {
         httpResponse.setResponseLine(httpVersion, statusCode);
@@ -32,7 +37,11 @@ public class HttpResponseManager {
         httpResponse.setResponseLine(request.getHttpVersion(), 404);
     }
 
-    public HttpResponse getHttpResponse() {
-        return httpResponse;
+    public void set500ErrorResponse() {
+        httpResponse.setResponseLine(BASE_HTTP_VERSION, 500);
+    }
+
+    public void set500ErrorResponse(HttpRequest request) {
+        httpResponse.setResponseLine(request.getHttpVersion(), 500);
     }
 }

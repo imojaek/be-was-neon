@@ -6,6 +6,7 @@ import handler.PostMethodHandler;
 import handler.UndefinedMethodHandler;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.HttpResponseManager;
 import parser.RequestParser;
 import sessions.Session;
 import org.slf4j.Logger;
@@ -50,7 +51,9 @@ public class MainHandler implements Runnable {
             // 서버의 처리로 나온 HTTP 응답을 발송한다.
             response.sendResponse(dos);
 
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException e) {
+            HttpResponseManager httpResponseManager = new HttpResponseManager();
+            httpResponseManager.set500ErrorResponse();
             logger.error(e.getMessage());
         }
     }
@@ -59,7 +62,7 @@ public class MainHandler implements Runnable {
         return request.getCookies().isPresent();
     }
 
-    private HttpResponse actionByMethod(HttpRequest request) throws IOException {
+    private HttpResponse actionByMethod(HttpRequest request) {
         HttpMethodHandler HttpMethodHandler;
         if (request.getMethod().equals("GET")) {
             HttpMethodHandler = new GetMethodHandler();
