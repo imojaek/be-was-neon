@@ -23,12 +23,10 @@ public class UserlistHandler implements UrlRequestHandler {
     private static final String BASE_PATH = "./src/main/resources/static";
     private static final Logger logger = LoggerFactory.getLogger(UserlistHandler.class);
 
+    // 쿠키의 sid가 유효하면 UserList를 반환, 유효하지 않으면 로그인페이지로 이동
     @Override
     public HttpResponse handle(HttpRequest request) {
-        if (Session.isValidSession(request.getSessionId()))
-            return sendUserList(request);
-        httpResponseManager.setRedirectReponse(request, "/login");
-        return httpResponseManager.getHttpResponse();
+        return sendUserList(request);
     }
 
     private HttpResponse sendUserList(HttpRequest request) {

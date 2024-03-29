@@ -8,9 +8,9 @@ import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 import parser.RequestParser;
-import sessions.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sessions.Session;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -34,15 +34,6 @@ public class MainHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
             HttpRequest httpRequest = requestParser.parse(in);
-
-            if (httpRequest.getPath().endsWith(".html") && hasCookie(httpRequest)) {
-                if (httpRequest.getCookies().isPresent()) {
-                    String sid = httpRequest.getSessionId();
-                    if (Session.isValidSession(sid)) {
-                        logger.debug("현재 세션의 UserId : {}, sid : {}", Session.getUserBySid(sid).getUserId(), sid);
-                    }
-                }
-            }
             logger.debug("Request : {}", httpRequest.getRequestLine());
 
             // 요청에 대한 처리
@@ -58,12 +49,25 @@ public class MainHandler implements Runnable {
         }
     }
 
-    private boolean hasCookie(HttpRequest request) {
-        return request.getCookies().isPresent();
+    private boolean isProtectedPath(HttpRequest httpRequest) {
+        for (ProtectedPath value : ProtectedPath.values()) {
+            if (httpRequest.getPath().equals(value.getPath()))
+                return true;
+        }
+        return false;
     }
 
     private HttpResponse actionByMethod(HttpRequest request) {
         HttpMethodHandler HttpMethodHandler;
+        // 권한이 있는 페이지를 요청하고 있는지, 그리고 그러한 페이지를 요청하고 있다면 로그인된 쿠키를 가지고 있는지 확인한다.
+        if (isProtectedPath(request)) {
+            if (!Session.isValidSession(request.getSessionId())) {
+                HttpResponseManager httpResponseManager = new HttpResponseManager();
+                httpResponseManager.setRedirectReponse(request, "/login");
+                return httpResponseManager.getHttpResponse();
+            }
+        }
+
         if (request.getMethod().equals("GET")) {
             HttpMethodHandler = new GetMethodHandler();
         }
