@@ -42,7 +42,7 @@ public class SendFileHandler implements UrlRequestHandler {
             ContentType contentType = getContentTypeByPath(request.getPath()); // 확장자가 없는 폴더의 경우, index.html을 호출할 것이므로 HTML을 반환할 것입니다.
             httpResponseManager.addHeader("Content-Type", contentType.getContentTypeMsg() + ";charset=utf-8");
             byte[] body = readFileByte(modifyRequestPath(request));
-            if (modifyRequestPath(request).equals(BASE_PATH + "/index.html")) {
+            if (modifyRequestPath(request).endsWith(".html")) {
                 body = refreshMainPage(request, body);
             }
             httpResponseManager.setBody(body);
@@ -61,9 +61,15 @@ public class SendFileHandler implements UrlRequestHandler {
             return body;
         }
         String bodyString = new String(body, StandardCharsets.UTF_8);
-        String userId = Session.getUserBySid(request.getSessionId()).getUserId();
-        bodyString = HtmlReplacer.replaceLoginButton(bodyString, "/user/list", userId + "님, 환영합니다!");
+        bodyString = refreshLoginButton(request, bodyString);
+
         return bodyString.getBytes();
+    }
+
+    private String refreshLoginButton(HttpRequest request, String bodyString) {
+        String name = Session.getUserBySid(request.getSessionId()).getName();
+        bodyString = HtmlReplacer.replaceLoginButton(bodyString, "/user/list", name + "님, 환영합니다!");
+        return bodyString;
     }
 
     private String modifyRequestPath(HttpRequest request) {
