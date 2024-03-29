@@ -25,6 +25,7 @@ public class PostMethodHandler implements HttpMethodHandler {
         return actionByPath(request);
     }
 
+    // 요청 경로로의 동작이 있는지 확인하고, 없는 경우 404를 반환한다.
     public HttpResponse actionByPath(HttpRequest request){
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {

@@ -19,6 +19,7 @@ public class CreateUserHandler implements UrlRequestHandler {
     @Override
     public HttpResponse handle(HttpRequest request) {
         dataMap = request.getBodyDataMap();
+        // 사용자가 가입하려는 ID 가 이미 서버에 존재하는 경우
         if (Database.findUserById(dataMap.get("userid")) != null) {
             httpResponseManager.setRedirectReponse(request, "/registration");
             return httpResponseManager.getHttpResponse();

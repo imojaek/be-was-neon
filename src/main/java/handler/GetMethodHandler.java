@@ -23,6 +23,7 @@ public class GetMethodHandler implements HttpMethodHandler {
         return actionByPath(request);
     }
 
+    // 요청 경로로의 지정된 행동이 있는지 확인하고, 아닌 경우 파일을 반환하도록 한다.
     private HttpResponse actionByPath(HttpRequest request) {
         for (String definedPath : actionMap.keySet()) {
             if (definedPath.equals(request.getPath())) {
