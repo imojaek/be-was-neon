@@ -6,33 +6,33 @@ import java.util.Map;
 public class Header {
     // SET-COOKIES
     private static final String SET_COOKIE = "Set-Cookie";
-    private final Map<String, String> headers;
+    private final Map<String, String> headerMap;
 
     public Header() {
-        this.headers = new HashMap<>();
+        this.headerMap = new HashMap<>();
     }
 
     public Header(Map<String, String> headerContent) {
-        this.headers = headerContent;
+        this.headerMap = headerContent;
     }
 
     public void addHeader(String name, String value) {
-        headers.put(name, value);
+        headerMap.put(name, value);
     }
 
     public void addCookie(String name, String value) {
-        if (!headers.containsKey(SET_COOKIE)) {
-            headers.put(SET_COOKIE, "");
+        if (!headerMap.containsKey(SET_COOKIE)) {
+            headerMap.put(SET_COOKIE, "");
         }
-        String newCookie = headers.get(SET_COOKIE).concat(name + "=" + value + "; ");
-        headers.put(SET_COOKIE, newCookie);
+        String newCookie = headerMap.get(SET_COOKIE).concat(name + "=" + value + "; ");
+        headerMap.put(SET_COOKIE, newCookie);
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
+    public Map<String, String> getHeaderMap() {
+        return headerMap;
     }
 
     public String get(String name) {
-        return headers.get(name);
+        return headerMap.get(name);
     }
 }

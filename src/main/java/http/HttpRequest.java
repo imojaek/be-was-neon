@@ -80,7 +80,7 @@ public class HttpRequest {
     @Override
     public String toString() {
         try {
-            return requestLine.toString() + "\n" + headers.getHeaders() + "\n" + new String(body.getBodyContent(), ENCODING);
+            return requestLine.toString() + "\n" + headers.getHeaderMap() + "\n" + new String(body.getBodyContent(), ENCODING);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
