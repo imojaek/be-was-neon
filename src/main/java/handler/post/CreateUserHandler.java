@@ -14,15 +14,21 @@ import java.util.Map;
 public class CreateUserHandler implements UrlRequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(CreateUserHandler.class);
     private final HttpResponseManager httpResponseManager = new HttpResponseManager();
+    private Map<String, String> dataMap;
 
     @Override
     public HttpResponse handle(HttpRequest request) {
+        dataMap = request.getBodyDataMap();
+        if (Database.findUserById(dataMap.get("userid")) != null) {
+            httpResponseManager.setRedirectReponse(request, "/registration");
+            return httpResponseManager.getHttpResponse();
+        }
+
         addNewUser(request);
         return httpResponseManager.getHttpResponse();
     }
 
     private void addNewUser(HttpRequest request) {
-        Map<String, String> dataMap = request.getBodyDataMap();
         Database.addUser(new User(dataMap.get("userid"), dataMap.get("password"), dataMap.get("name"), dataMap.get("email")));
         logger.debug("새로운 회원 등록 userID : " + dataMap.get("userid"));
 
