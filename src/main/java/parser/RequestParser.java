@@ -26,7 +26,7 @@ public class RequestParser {
     }
 
     private byte[] makeBody(BufferedInputStream bis, Map<String, String> headers) throws IOException {
-        List<Byte> byteList = new ArrayList<>();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         if (headers.containsKey("Content-Length") && Integer.parseInt(headers.get("Content-Length")) > 0) {
             int contentLength = Integer.parseInt(headers.get("Content-Length"));
             byte[] buffer = new byte[BUFFER_SIZE];
@@ -34,15 +34,10 @@ public class RequestParser {
             while(contentLength > 0) {
                 int read = bis.read(buffer, 0, readLength);
                 contentLength -= read;
-                for (int i = 0; i < read; i++) {
-                    byteList.add(buffer[i]);
-                }
+                bos.write(buffer, 0, read);
             }
-            byte[] result = new byte[byteList.size()];
-            for (int i = 0; i < byteList.size(); i++) {
-                result[i] = byteList.get(i);
-            }
-            return result;
+
+            return bos.toByteArray();
         }
         return new byte[0];
     }
