@@ -2,6 +2,7 @@ package utils;
 
 public class HtmlReplacer {
     private static final String TABLE_TAG = "{{{TABLE}}}";
+    private static final String LOGIN_BUTTON = "href=\"/login\">로그인";
     private static final String LOGIN_TXT = "로그인";
     private static final String LOGIN_HREF = "href=\"/login\">";
 
@@ -10,7 +11,8 @@ public class HtmlReplacer {
     }
 
     public static String replaceLoginButton(String origin, String replaceHref, String replaceTxt) {
-        return replaceLoginButtonHref(replaceLoginText(origin, replaceTxt), replaceHref);
+        String replacement = "href=\"" + replaceHref + "\">" + replaceTxt;
+        return replaceString(origin, LOGIN_BUTTON, replacement);
     }
 
     public static String replaceLoginText(String origin, String replacement) {
