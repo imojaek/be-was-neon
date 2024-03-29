@@ -7,6 +7,7 @@ import handler.UndefinedMethodHandler;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
+import http.HttpSender;
 import parser.RequestParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,8 @@ public class MainHandler implements Runnable {
             HttpResponse response = actionByMethod(httpRequest);
 
             // 서버의 처리로 나온 HTTP 응답을 발송한다.
-            response.sendResponse(dos);
+            HttpSender  httpSender = new HttpSender();
+            httpSender.sendResponse(dos, response);
 
         } catch (IOException e) {
             HttpResponseManager httpResponseManager = new HttpResponseManager();
