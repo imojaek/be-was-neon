@@ -21,17 +21,25 @@ public class LoginHandler implements UrlRequestHandler {
     }
 
     private void loginUser(HttpRequest request) {
-        String tmpsid = makeRandomString();
         Map<String, String> dataMap = request.getBodyDataMap();
         if (isValidCredentials(dataMap)) {
+            String sid = makesid();
             User loginUser = Database.findUserById(dataMap.get("login_id"));
-            Session.addSession(tmpsid, loginUser);
+            Session.addSession(sid, loginUser);
             httpResponseManager.setRedirectReponse(request, "/main/index.html");
-            httpResponseManager.addCookie("sid", tmpsid);
+            httpResponseManager.addCookie("sid", sid);
             httpResponseManager.addCookie("path", "/");
             return ;
         }
         httpResponseManager.setRedirectReponse(request, "/login/login_failed.html");
+    }
+
+    private String makesid() {
+        String sid = makeRandomString();
+        while (Session.isExistSession(sid)) {
+            sid = makeRandomString();
+        }
+        return sid;
     }
 
     private boolean isValidCredentials(Map<String, String> dataMap) {

@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Session {
     private static final Map<String, User> sessionMap = new ConcurrentHashMap<>();
 
+    public static boolean isExistSession(String sid) {
+        return sessionMap.containsKey(sid);
+    }
     public static void addSession(String sid, User user) {
         sessionMap.put(sid, user);
     }
