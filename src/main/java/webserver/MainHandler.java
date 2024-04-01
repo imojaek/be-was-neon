@@ -51,24 +51,16 @@ public class MainHandler implements Runnable {
         }
     }
 
-    private boolean isProtectedPath(HttpRequest httpRequest) {
-        for (ProtectedPath value : ProtectedPath.values()) {
-            if (httpRequest.getPath().equals(value.getPath()))
-                return true;
-        }
-        return false;
-    }
-
     private HttpResponse actionByMethod(HttpRequest request) {
-        HttpMethodHandler HttpMethodHandler;
-        // 권한이 있는 페이지를 요청하고 있는지, 그리고 그러한 페이지를 요청하고 있다면 로그인된 쿠키를 가지고 있는지 확인한다.
-        if (isProtectedPath(request)) {
-            if (!Session.isValidSession(request.getSessionId())) {
-                HttpResponseManager httpResponseManager = new HttpResponseManager();
-                httpResponseManager.setRedirectReponse(request, "/login");
-                return httpResponseManager.getHttpResponse();
-            }
+        // 요청경로의 권한을 확인하고, 사용자가 필요한 권한을 가지고 있는지 확인합니다.
+        SecurityManager securityManager = new SecurityManager();
+        if (!securityManager.hasValidatePermission(request)) {
+            HttpResponseManager httpResponseManager = new HttpResponseManager();
+            httpResponseManager.setRedirectReponse(request, "/login");
+            return httpResponseManager.getHttpResponse();
         }
+
+        HttpMethodHandler HttpMethodHandler;
 
         if (request.getMethod().equals("GET")) {
             HttpMethodHandler = new GetMethodHandler();
