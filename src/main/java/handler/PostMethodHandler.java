@@ -1,5 +1,6 @@
 package handler;
 
+import handler.post.CreateArticleHandler;
 import handler.post.CreateUserHandler;
 import handler.post.LoginHandler;
 import handler.post.LogoutHandler;
@@ -42,5 +43,6 @@ public class PostMethodHandler implements HttpMethodHandler {
         actionMap.put("/user/create", new CreateUserHandler());
         actionMap.put("/user/login", new LoginHandler());
         actionMap.put("/user/logout", new LogoutHandler());
+        actionMap.put("/article/create", new CreateArticleHandler());
     }
 }

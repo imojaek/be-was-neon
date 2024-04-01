@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public enum PathSecurity {
-    NEED_LOGIN(List.of("/user/list")),
+    NEED_LOGIN(List.of("/user/list", "/article")),
     PUBLIC(List.of());
 
     private final List<String> pathList;
