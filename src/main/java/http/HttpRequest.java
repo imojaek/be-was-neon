@@ -1,6 +1,7 @@
 package http;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class HttpRequest {
 
     public Map<String, String> getBodyDataMap() {
         if (bodyDataMap == null) {
-            String str = new String(getBodyContent(), StandardCharsets.UTF_8);
+            String str = URLDecoder.decode(new String(getBodyContent(), StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             bodyDataMap = makeBodyData(str);
         }
         return bodyDataMap;
