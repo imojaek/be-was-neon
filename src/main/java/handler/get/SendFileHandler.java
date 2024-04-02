@@ -1,5 +1,7 @@
 package handler.get;
 
+import article.Article;
+import article.ArticleManager;
 import handler.UrlRequestHandler;
 import http.ContentType;
 import http.HttpRequest;
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 public class SendFileHandler implements UrlRequestHandler {
     private static final String BASE_PATH = "./src/main/resources/static";
     HttpResponseManager httpResponseManager = new HttpResponseManager();
+    ArticleManager articleManager = new ArticleManager();
     private static final Logger logger = LoggerFactory.getLogger(SendFileHandler.class);
 
     @Override
@@ -57,11 +60,13 @@ public class SendFileHandler implements UrlRequestHandler {
     }
 
     private byte[] refreshMainPage(HttpRequest request, byte[] body) {
-        if (!Session.isValidSession(request.getSessionId())) {
-            return body;
-        }
         String bodyString = new String(body, StandardCharsets.UTF_8);
-        bodyString = refreshLoginButton(request, bodyString);
+        if (Session.isValidSession(request.getSessionId())) {
+            bodyString = refreshLoginButton(request, bodyString);
+        }
+        if (articleManager.hasArticle()) {
+            bodyString = refreshArticle(bodyString, articleManager.getLatestArticle());
+        }
 
         return bodyString.getBytes();
     }
@@ -69,6 +74,12 @@ public class SendFileHandler implements UrlRequestHandler {
     private String refreshLoginButton(HttpRequest request, String bodyString) {
         String name = Session.getUserBySid(request.getSessionId()).getName();
         bodyString = HtmlReplacer.replaceLoginButton(bodyString, "/user/list", name + "님, 환영합니다!");
+        return bodyString;
+    }
+
+    private String refreshArticle(String bodyString, Article article) {
+        bodyString = HtmlReplacer.replaceAuthorName(bodyString, article.getAuthorName());
+        bodyString = HtmlReplacer.replaceArticleContent(bodyString, article.getContent());
         return bodyString;
     }
 
