@@ -62,7 +62,7 @@ public class SendFileHandler implements UrlRequestHandler {
     private byte[] refreshMainPage(HttpRequest request, byte[] body) {
         String bodyString = new String(body, StandardCharsets.UTF_8);
         if (Session.isValidSession(request.getSessionId())) {
-            bodyString = refreshLoginButton(request, bodyString);
+            bodyString = refreshSessionArea(request, bodyString);
         }
         if (articleManager.hasArticle()) {
             bodyString = refreshArticle(bodyString, articleManager.getLatestArticle());
@@ -71,10 +71,8 @@ public class SendFileHandler implements UrlRequestHandler {
         return bodyString.getBytes();
     }
 
-    private String refreshLoginButton(HttpRequest request, String bodyString) {
-        String name = Session.getUserBySid(request.getSessionId()).getName();
-        bodyString = HtmlReplacer.replaceLoginButton(bodyString, "/user/list", name + "님, 환영합니다!");
-        return bodyString;
+    private String refreshSessionArea(HttpRequest request, String bodyString) {
+        return HtmlReplacer.makeLoginSession(bodyString, Session.getUserBySid(request.getSessionId()).getName());
     }
 
     private String refreshArticle(String bodyString, Article article) {

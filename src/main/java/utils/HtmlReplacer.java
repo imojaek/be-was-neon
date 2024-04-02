@@ -2,28 +2,37 @@ package utils;
 
 public class HtmlReplacer {
     private static final String TABLE_TAG = "{{{TABLE}}}";
-    private static final String LOGIN_BUTTON = "href=\"/login\">로그인";
-    private static final String LOGIN_TXT = "로그인";
-    private static final String LOGIN_HREF = "href=\"/login\">";
-    private static final String AUTHOR_NAME_REG = "<!--AUTHOR_NAME_START-->(.*?)<!--AUTHOR_NAME_END-->";
-    private static final String CONTENT_REG = "<!--CONTENT_START-->(.*?)<!--CONTENT_END-->";
+    private static final String AUTHOR_NAME_REG = "<!--AUTHOR_NAME_START-->((.|\\r|\\n)*?)<!--AUTHOR_NAME_END-->";
+    private static final String CONTENT_REG = "<!--CONTENT_START-->((.|\\r|\\n)*?)<!--CONTENT_END-->";
+    private static final String SESSION_REG = "<!--SESSION_START-->((.|\\r|\\n)*?)<!--SESSION_END-->";
 
     public static String replaceTable(String origin, String replacement) {
         return replaceString(origin, TABLE_TAG, replacement);
     }
 
-    public static String replaceLoginButton(String origin, String replaceHref, String replaceTxt) {
-        String replacement = "href=\"" + replaceHref + "\">" + replaceTxt;
-        return replaceString(origin, LOGIN_BUTTON, replacement);
+    public static String makeLoginSession(String origin, String userName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(userButton(userName));
+        sb.append(logoutButton());
+        return origin.replaceAll(SESSION_REG, sb.toString());
     }
 
-    public static String replaceLoginText(String origin, String replacement) {
-        return replaceString(origin, LOGIN_TXT, replacement);
+    private static String userButton(String userName) {
+        return "<li class=\"header__menu__item\">\r\n" +
+                "            <a class=\"btn btn_contained btn_size_s\" href=\"/user/list\">\r\n" +
+                "            " + userName + "님, 환영합니다!\r\n" +
+                "            </a>\r\n" +
+                "          </li>\r\n";
     }
 
-    public static String replaceLoginButtonHref(String origin, String href) {
-        String replacement = "href=\"" + href + "\">";
-        return replaceString(origin, LOGIN_HREF, replacement);
+    private static String logoutButton() {
+        return "<li class=\"header__menu__item\">\r\n" +
+                "            <form action=\"/user/logout\" method=\"post\">\r\n" +
+                "              <button id=\"logout-btn\" class=\"btn btn_contained btn_size_s\">\r\n" +
+                "                로그아웃\r\n" +
+                "              </button>\r\n" +
+                "            </form>\r\n" +
+                "          </li>\r\n";
     }
 
     private static String replaceString(String origin, String target, String replacement) {

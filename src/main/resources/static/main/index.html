@@ -13,14 +13,18 @@
         <a href="/main"><img src="../img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+            <a class="btn btn_contained btn_size_s" href="/article">
+              글쓰기
+            </a>
           </li>
+          <!--SESSION_START-->
           <li class="header__menu__item">
             <form action="/user/logout" method="post">
-              <button id="logout-btn" class="btn btn_ghost btn_size_s">
+              <button id="logout-btn" class="btn btn_contained btn_size_s">
                 로그아웃
               </button>
             </form>
+            <!--SESSION_END-->
           </li>
         </ul>
       </header>
@@ -28,7 +32,11 @@
         <div class="post">
           <div class="post__account">
             <img class="post__account__img" />
-            <p class="post__account__nickname">account</p>
+            <p class="post__account__nickname">
+              <!--AUTHOR_NAME_START-->
+              account
+              <!--AUTHOR_NAME_END-->
+            </p>
           </div>
           <img class="post__img" />
           <div class="post__menu">
@@ -49,6 +57,7 @@
             </button>
           </div>
           <p class="post__article">
+            <!--CONTENT_START-->
             우리는 시스템 아키텍처에 대한 일관성 있는 접근이 필요하며, 필요한
             모든 측면은 이미 개별적으로 인식되고 있다고 생각합니다. 즉, 응답이
             잘 되고, 탄력적이며 유연하고 메시지 기반으로 동작하는 시스템 입니다.
@@ -59,6 +68,7 @@
             비록 장애가 발생 하더라도, 재난이 일어나기 보다는 간결한 방식으로
             해결합니다. 리액티브 시스템은 높은 응답성을 가지며 사용자 에게
             효과적인 상호적 피드백을 제공합니다.
+            <!--CONTENT_END-->
           </p>
         </div>
         <ul class="comment">
