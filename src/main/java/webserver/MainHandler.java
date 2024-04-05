@@ -8,10 +8,9 @@ import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpResponseManager;
 import http.HttpSender;
-import parser.RequestParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sessions.Session;
+import parser.RequestParser;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

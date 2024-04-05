@@ -12,16 +12,16 @@ import java.util.Map;
 import java.util.Random;
 
 public class LoginHandler implements UrlRequestHandler {
-    HttpResponseManager httpResponseManager;
+    private final HttpResponseManager httpResponseManager = new HttpResponseManager();
+    private Map<String, String> dataMap;
     @Override
     public HttpResponse handle(HttpRequest request) {
-        httpResponseManager = new HttpResponseManager();
+        dataMap = request.getBodyDataMap();
         loginUser(request);
         return httpResponseManager.getHttpResponse();
     }
 
     private void loginUser(HttpRequest request) {
-        Map<String, String> dataMap = request.getBodyDataMap();
         if (isValidCredentials(dataMap)) {
             String sid = makesid();
             User loginUser = Database.findUserById(dataMap.get("login_id"));

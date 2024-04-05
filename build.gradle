@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 group 'codesquad'
@@ -9,14 +11,32 @@ repositories {
     mavenCentral()
 }
 
+shadowJar {
+    archiveBaseName.set('yourapp')
+    archiveVersion.set('1.0-SNAPSHOT')
+    archiveClassifier.set('')
+
+    manifest {
+        attributes 'Main-Class': 'webserver.WebServer'
+    }
+}
+
+application {
+    mainClassName = 'webserver.WebServer'
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
+}
 
-
+jar {
+    manifest {
+        attributes 'Main-Class': 'webserver.WebServer'
+    }
 }
 
 test {

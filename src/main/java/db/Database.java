@@ -9,6 +9,11 @@ import java.util.Map;
 public class Database {
     private static Map<String, User> users = new HashMap<>();
 
+    static {
+        addUser(new User("admin", "123", "관리자", "noreply@codesquad.kr"));
+    }
+
+
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
     }
